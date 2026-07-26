@@ -612,8 +612,8 @@ server-side endpoints (FR-068), never on the interactive path:
   explanation — 100% coverage, no gaps — and the full game including advice works with the
   network disabled.
 - **SC-011**: A player following the recommendation reaches the top of the progression
-  ladder within roughly 120 hands — a few sittings, not a grind — and every guide has been
-  unlocked by that point.
+  ladder within roughly 120–140 hands — a few sittings, not a grind — and every guide has
+  been unlocked by that point.
 
 ---
 
