@@ -42,19 +42,25 @@
 
 Confirm each gate below, or record the deviation in Complexity Tracking.
 
-- [ ] **I. Code Quality**: Rules/scoring logic stays pure — no I/O, clock, or unseeded RNG
-      in rule modules. All new public functions annotated; type checker clean. No module
-      over 400 lines or function over 50 lines without justification below.
+- [ ] **I. Code Quality**: Rules/scoring logic stays pure — no I/O, DOM, network, clock, or
+      unseeded RNG in engine modules. Strict TypeScript; no implicit `any`. No module over
+      400 lines or function over 50 lines without justification below.
 - [ ] **II. Test-First (NON-NEGOTIABLE)**: Tests are written and observed failing before
-      implementation. Randomness is injected and seeded. Rules/scoring coverage ≥ 90%.
+      implementation. Randomness is injected and seeded; no test depends on wall clock,
+      viewport size, or network. Rules/scoring coverage ≥ 90%.
 - [ ] **III. UX Consistency**: Action vocabulary is `hit`/`stand`/`double`/`split`/
-      `surrender`. Prompts state accepted inputs; invalid input re-prompts rather than
-      crashing. Board state visible at every decision point. stdout for game, stderr for
-      diagnostics.
-- [ ] **IV. Performance**: p95 input→render < 100ms; cold start < 1s; test suite < 30s;
-      per-session memory bounded. Any performance claim cites before/after measurements.
-- [ ] **Constraints**: Python ≥ 3.13 via `uv`; each new runtime dependency justified;
-      `src/` and `tests/{unit,integration}` layout; no network calls.
+      `surrender`. Only legal actions offered. No modal interrupts a hand. Board state
+      visible at every decision point. Keyboard-operable; WCAG 2.1 AA contrast. Pacing is
+      interruptible.
+- [ ] **IV. Performance**: p95 input→render < 100ms; first load to interactive < 2s; no
+      interactive path awaits the network; unit/engine suite < 30s; per-session memory
+      bounded. Any performance claim cites before/after measurements.
+- [ ] **Constraints**: Strict TypeScript; each new runtime dependency justified; engine
+      testable without a browser and importing no UI/network/persistence code; server-side
+      endpoints stateless; local state authoritative during play; playable offline after
+      first load.
+- [ ] **Data safety**: No database credential in any client bundle or client-visible
+      response. No personal information stored.
 
 ## Project Structure
 
