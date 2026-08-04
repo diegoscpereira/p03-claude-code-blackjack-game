@@ -86,7 +86,13 @@ test.describe('User Story 1 — play a complete hand', () => {
     await page.keyboard.press('Enter');
 
     await expect(page.getByTestId('hand-h1')).toBeVisible();
-    await page.keyboard.press('s'); // stand
+
+    // FR-036: the first key skips the pending bot turns and is consumed by that
+    // skip rather than acting on the player's hand. The second one stands.
+    await page.keyboard.press('s');
+    await expect(page.getByTestId('outcome')).toHaveCount(0);
+
+    await page.keyboard.press('s');
     await expect(page.getByTestId('outcome')).toBeVisible();
   });
 

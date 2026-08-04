@@ -3,6 +3,7 @@ import { HandView } from './Hand';
 import { Controls } from './Controls';
 import { Bankroll } from './Bankroll';
 import { CompanionPanel } from '../companion/CompanionPanel';
+import { BotSeats } from './BotSeat';
 import { ACTION_KEYS } from './actionReasons';
 import { useDealPacing } from './useDealPacing';
 import { useGameStore } from '../../store/gameStore';
@@ -24,6 +25,8 @@ export function Table() {
   const lastSettled = useGameStore((s) => s.lastSettled);
   const bankroll = useGameStore((s) => s.bankroll);
   const bet = useGameStore((s) => s.bet);
+  // FR-034: controls stay disabled while bot turns are still being revealed.
+  const controlsLocked = useGameStore((s) => s.controlsLocked());
 
   const dealtCards = round
     ? round.playerHands.reduce((n, h) => n + h.cards.length, 0) + round.dealerHand.cards.length
@@ -47,6 +50,7 @@ export function Table() {
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4">
       <Bankroll />
       <Felt revealed={revealed} />
+      <BotSeats />
       <CompanionPanel />
       <Outcome />
 
@@ -60,7 +64,7 @@ export function Table() {
           Deal
         </button>
       ) : (
-        <Controls round={round} legal={legal} onAct={onAct} />
+        <Controls round={round} legal={legal} onAct={onAct} locked={controlsLocked} />
       )}
 
       {lastSettled && (

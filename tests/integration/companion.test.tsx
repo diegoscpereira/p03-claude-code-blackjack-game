@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+﻿import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CompanionPanel } from '../../src/ui/companion/CompanionPanel';
@@ -28,6 +28,7 @@ const SEED = 20260804;
 describe('CompanionPanel (FR-022)', () => {
   it('FR-022: lists every legal action with its expected value', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
 
     const rows = screen.getAllByTestId(/^companion-action-/);
@@ -39,18 +40,21 @@ describe('CompanionPanel (FR-022)', () => {
 
   it('FR-022: marks exactly one action as recommended', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
     expect(screen.getAllByTestId('companion-recommended')).toHaveLength(1);
   });
 
   it('FR-023: shows a plain-language explanation alongside the recommendation', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
     expect(screen.getByTestId('companion-explanation').textContent?.length).toBeGreaterThan(20);
   });
 
   it('FR-026: records match data but shows no advice when disabled', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     useGameStore.getState().setCompanionEnabled(false);
     render(<CompanionPanel />);
 
@@ -76,6 +80,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
 
   it('FR-024: records the decision with its recommendation and match flag', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     const { chosen, recommended } = actAgainstAdvice();
 
     const decision = useGameStore.getState().lastDecision!;
@@ -86,6 +91,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
 
   it('FR-024: records a matching decision as matched', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     const store = useGameStore.getState();
     store.act(store.recommendation()!);
     expect(useGameStore.getState().lastDecision!.matched).toBe(true);
@@ -93,6 +99,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
 
   it('FR-025: the action is carried out without interruption', async () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     render(<Table />);
 
     const before = useGameStore.getState().round;
@@ -106,6 +113,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
 
   it('FR-025: shows the recommendation and the EV difference afterwards', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     actAgainstAdvice();
     render(<CompanionPanel />);
 
@@ -116,6 +124,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
 
   it('FR-025: says nothing after a decision that matched', () => {
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     const store = useGameStore.getState();
     store.act(store.recommendation()!);
     render(<CompanionPanel />);
@@ -144,6 +153,7 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
     const user = userEvent.setup();
     useGameStore.getState().setCompanionEnabled(false);
     useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
     render(<Table />);
 
     await user.click(screen.getByTestId('action-stand'));

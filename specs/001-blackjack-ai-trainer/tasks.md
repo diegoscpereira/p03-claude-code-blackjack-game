@@ -193,19 +193,19 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 5 (REQUIRED - write first) ⚠️
 
-- [ ] T079 [P] [US5] Unit test bot decision reproducibility from a seed in `tests/unit/bots/decide.test.ts` (FR-031)
-- [ ] T080 [P] [US5] Unit test that the Conservative Math profile takes the basic-strategy action and the Aggressive High-Roller deviates consistently with its documented profile, in `tests/unit/bots/profiles.test.ts` (FR-032)
-- [ ] T081 [P] [US5] Unit test that bot outcomes never alter player bankroll, XP, or statistics, in `tests/unit/bots/isolation.test.ts` (FR-035)
-- [ ] T082 [US5] Integration test in `tests/integration/bot-pacing.test.tsx` asserting turns collapse on input and the collapsed outcome equals the un-collapsed outcome (FR-036, FR-037)
+- [X] T079 [P] [US5] Unit test bot decision reproducibility from a seed in `tests/unit/bots/decide.test.ts` (FR-031)
+- [X] T080 [P] [US5] Unit test that the Conservative Math profile takes the basic-strategy action and the Aggressive High-Roller deviates consistently with its documented profile, in `tests/unit/bots/profiles.test.ts` (FR-032)
+- [X] T081 [P] [US5] Unit test that bot outcomes never alter player bankroll, XP, or statistics, in `tests/unit/bots/isolation.test.ts` (FR-035)
+- [X] T082 [US5] Integration test in `tests/integration/bot-pacing.test.tsx` asserting turns collapse on input and the collapsed outcome equals the un-collapsed outcome (FR-036, FR-037)
 
 ### Implementation for User Story 5
 
-- [ ] T083 [P] [US5] Define the two bot profiles in `src/bots/profiles.ts` with documented decision rules (FR-032, spec Assumption 5)
-- [ ] T084 [US5] Implement `decide(profile, state, rng)` in `src/bots/decide.ts` (depends on T083, T071)
-- [ ] T085 [US5] Add bot seats to `RoundState` handling in `src/engine/round.ts`, keeping bot settlement separate from player settlement (FR-035)
-- [ ] T086 [US5] Build the `BotSeat` component in `src/ui/table/BotSeat.tsx` labelling each action with the bot's name (FR-033)
-- [ ] T087 [US5] Implement the 600ms cancellable turn timer in `src/store/gameStore.ts`, disabling player controls during bot turns (FR-033, FR-034)
-- [ ] T088 [US5] Implement turn collapse on any player input, consuming that input rather than applying it to the player's hand (FR-036, spec Edge Cases)
+- [X] T083 [P] [US5] Define the two bot profiles in `src/bots/profiles.ts` with documented decision rules (FR-032, spec Assumption 5)
+- [X] T084 [US5] Implement `decide(profile, state, rng)` in `src/bots/decide.ts` (depends on T083, T071)
+- [X] T085 [US5] Add bot seats to `RoundState` handling in `src/engine/round.ts`, keeping bot settlement separate from player settlement (FR-035)
+- [X] T086 [US5] Build the `BotSeat` component in `src/ui/table/BotSeat.tsx` labelling each action with the bot's name (FR-033)
+- [X] T087 [US5] Implement the 600ms cancellable turn timer in `src/store/gameStore.ts`, disabling player controls during bot turns (FR-033, FR-034)
+- [X] T088 [US5] Implement turn collapse on any player input, consuming that input rather than applying it to the player's hand (FR-036, spec Edge Cases)
 
 **Checkpoint**: The table feels populated and the playstyle contrast is visible.
 

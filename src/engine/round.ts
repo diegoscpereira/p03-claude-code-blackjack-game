@@ -98,7 +98,11 @@ export function startRound(options: StartRoundOptions): RoundState {
     dealerHand: dealer,
     dealerHoleCardRevealed: false,
     botSeats: bots.map(({ id, name, profileId, hand }) => ({ id, name, profileId, hand })),
-    phase: 'player',
+    // Bots are seated ahead of the player and act first, so the round opens on
+    // their turn when any are seated. FR-036 talks about collapsing pending bot
+    // turns to reach "the next player decision point", which only makes sense
+    // in that order.
+    phase: botSeats.length > 0 ? 'bots' : 'player',
     decisions: [],
     actionLog: [],
     availableBankroll: bankroll - bet,
@@ -212,11 +216,9 @@ function advance(state: RoundState): RoundState {
     return { ...state, activeHandIndex: nextIndex, phase: 'player' };
   }
 
-  return {
-    ...state,
-    activeHandIndex: state.playerHands.length - 1,
-    phase: state.botSeats.length > 0 ? 'bots' : 'dealer',
-  };
+  // Bots have already acted by this point, so the only place left to go is the
+  // dealer.
+  return { ...state, activeHandIndex: state.playerHands.length - 1, phase: 'dealer' };
 }
 
 /** Convenience for callers that need a hand's total without importing `hand.ts`. */

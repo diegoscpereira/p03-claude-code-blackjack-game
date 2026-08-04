@@ -5,6 +5,10 @@ import { settle } from '../engine/settle';
 import { legalActions } from '../engine/rules';
 import { DEFAULT_BET, PHASE_1_RULES, STARTING_BANKROLL } from '../engine/rules-config';
 import { nextSeed } from './seeds';
+import { createRng } from '../engine/rng';
+import { playBots } from '../bots/playBots';
+import { BOT_PROFILES, BOT_TURN_MS } from '../bots/profiles';
+import type { BotSeatConfig } from '../engine/types';
 import {
   readTutorialState,
   writeTutorialState,
@@ -58,6 +62,13 @@ export interface GameState {
   recommendation: () => Action | null;
   setCompanionEnabled: (enabled: boolean) => void;
 
+  /** How many bot actions have been revealed so far this round (FR-033). */
+  botActionsRevealed: number;
+  /** FR-034: true while bot turns are still being shown. */
+  controlsLocked: () => boolean;
+  /** FR-036: reveal every remaining bot action at once. */
+  collapseBotTurns: () => void;
+
   setBet: (amount: number) => void;
   deal: (seed?: number) => void;
   act: (action: Action) => void;
@@ -89,7 +100,18 @@ const initialState = () => ({
   lastEvGiveUp: null,
   decisionsTaken: 0,
   decisionsMatched: 0,
+  botActionsRevealed: 0,
 });
+
+/** The two bots seated at every table (spec Assumption 5). */
+function botSeatsFor(bet: number): BotSeatConfig[] {
+  return Object.values(BOT_PROFILES).map((profile, index) => ({
+    id: `b${index + 1}`,
+    name: profile.name,
+    profileId: profile.id,
+    bet: bet * profile.betMultiplier,
+  }));
+}
 
 /**
  * A seed for a round. Randomness is fine *here* — this is the store, not the
@@ -99,7 +121,6 @@ const initialState = () => ({
 const freshSeed = (): number => nextSeed();
 
 function roundActions(set: Set, get: Get) {
-  /** Runs the dealer and settles, applying the result to the bankroll once. */
   const finish = (state: RoundState): void => {
     const played = playDealer(state, rules);
     const settled = settle(played, rules);
@@ -119,16 +140,26 @@ function roundActions(set: Set, get: Get) {
       if (round && round.phase !== 'settled') return;
       if (bankroll < bet) return;
 
-      const next = startRound({
-        seed: seed ?? freshSeed(),
+      const roundSeed = seed ?? freshSeed();
+      const dealt = startRound({
+        seed: roundSeed,
         bet,
         rules,
         bankroll,
+        botSeats: botSeatsFor(bet),
         shoe: carriedShoe ?? undefined,
         shoeSize: carriedShoeSize || undefined,
       });
 
-      set({ round: next, lastSettled: null });
+      // FR-037: bot turns resolve *now*, in full. Everything after this is
+      // presentation — which is precisely why skipping it cannot change an
+      // outcome. A separate seed keeps bot randomness from perturbing the shoe.
+      const next =
+        dealt.phase === 'bots' ? playBots(dealt, rules, createRng(roundSeed ^ 0x5eed)) : dealt;
+
+      set({ round: next, lastSettled: null, botActionsRevealed: 0 });
+      startRevealTimer(set, get);
+
       // A natural resolves without the player acting (US1 acceptance 3).
       if (next.phase !== 'player') finish(next);
     },
@@ -136,6 +167,14 @@ function roundActions(set: Set, get: Get) {
     act: (action: Action): void => {
       const { round } = get();
       if (!round) return;
+
+      // FR-036: input arriving while bot turns are still being shown collapses
+      // them and is *consumed by that skip*, never applied to the player's own
+      // hand. Without this a keypress meant to skip would silently hit.
+      if (botTurnsPending(get())) {
+        get().collapseBotTurns();
+        return;
+      }
 
       // Snapshot the advice *before* the action changes the state.
       const decision = describeDecision(round, action);
@@ -152,6 +191,57 @@ function roundActions(set: Set, get: Get) {
       else finish(next);
     },
 
+  };
+}
+
+/** How many bot actions this round produced, in total. */
+function botActionCount(state: GameState): number {
+  return state.round?.actionLog.filter((entry) => entry.botId !== undefined).length ?? 0;
+}
+
+function botTurnsPending(state: GameState): boolean {
+  return state.botActionsRevealed < botActionCount(state);
+}
+
+/**
+ * T087 — the 600ms turn window (FR-033).
+ *
+ * A cancellable timer that advances a *counter*, nothing more. The engine has
+ * already resolved every bot turn, so this reveals history rather than making
+ * it — which is what constitution Principle IV means by pacing being excluded
+ * from the response budget while remaining interruptible.
+ */
+let revealTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearRevealTimer(): void {
+  if (revealTimer !== null) {
+    clearTimeout(revealTimer);
+    revealTimer = null;
+  }
+}
+
+function startRevealTimer(set: Set, get: Get): void {
+  clearRevealTimer();
+  if (!botTurnsPending(get())) return;
+
+  revealTimer = setTimeout(() => {
+    set({ botActionsRevealed: get().botActionsRevealed + 1 });
+    revealTimer = null;
+    startRevealTimer(set, get);
+  }, BOT_TURN_MS);
+}
+
+function botActions(set: Set, get: Get) {
+  return {
+    /** FR-034: the player's controls stay disabled while a bot is acting. */
+    controlsLocked: (): boolean => botTurnsPending(get()),
+
+    /** FR-036: resolve every remaining bot turn immediately. */
+    collapseBotTurns: (): void => {
+      if (!botTurnsPending(get())) return;
+      clearRevealTimer();
+      set({ botActionsRevealed: botActionCount(get()) });
+    },
   };
 }
 
@@ -242,7 +332,10 @@ function bankrollActions(set: Set, get: Get) {
     /** FR-026: hides the advice; the match data keeps being recorded. */
     setCompanionEnabled: (enabled: boolean): void => set({ companionEnabled: enabled }),
 
-    reset: (): void => set(initialState()),
+    reset: (): void => {
+      clearRevealTimer();
+      set(initialState());
+    },
   };
 }
 
@@ -273,6 +366,7 @@ function tutorialActions(set: Set, get: Get) {
 export const useGameStore = create<GameState>()((set, get) => ({
   ...initialState(),
   ...roundActions(set, get),
+  ...botActions(set, get),
   ...selectors(get),
   ...bankrollActions(set, get),
   ...tutorialActions(set, get),

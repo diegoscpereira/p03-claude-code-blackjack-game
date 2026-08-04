@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+﻿import { beforeEach, describe, expect, it } from 'vitest';
 import { useGameStore } from '../../src/store/gameStore';
 import { STARTING_BANKROLL } from '../../src/engine/rules-config';
 
@@ -25,6 +25,7 @@ describe('round loop through the store (User Story 1)', () => {
   it('FR-005: dealing puts cards on the table and takes the bet', () => {
     store().setBet(25);
     store().deal(42);
+    store().collapseBotTurns();
 
     const state = store();
     expect(state.round).not.toBeNull();
@@ -35,6 +36,7 @@ describe('round loop through the store (User Story 1)', () => {
 
   it('FR-002: the store offers exactly the engine\'s legal action set', () => {
     store().deal(42);
+    store().collapseBotTurns();
     const legal = store().legalActions();
     expect(legal).toContain('stand');
     expect(legal).not.toContain('surrender');
@@ -43,6 +45,7 @@ describe('round loop through the store (User Story 1)', () => {
   it('FR-007, FR-013: standing runs the dealer and settles the bankroll', () => {
     store().setBet(10);
     store().deal(42);
+    store().collapseBotTurns();
     store().act('stand');
 
     const state = store();
@@ -54,6 +57,7 @@ describe('round loop through the store (User Story 1)', () => {
   it('FR-013: the bankroll moves by exactly the settled amount, never twice', () => {
     store().setBet(10);
     store().deal(7);
+    store().collapseBotTurns();
     store().act('stand');
 
     const settledOnce = store().bankroll;
@@ -64,6 +68,7 @@ describe('round loop through the store (User Story 1)', () => {
 
   it('FR-014: a settled round emits a replayable hand record', () => {
     store().deal(123);
+    store().collapseBotTurns();
     store().act('stand');
 
     const log = store().lastSettled!.handLog;
@@ -74,6 +79,7 @@ describe('round loop through the store (User Story 1)', () => {
 
   it('FR-016: the shoe carries across rounds rather than reshuffling every hand', () => {
     store().deal(42);
+    store().collapseBotTurns();
     store().act('stand');
     const afterFirst = store().carriedShoe!.length;
     expect(afterFirst).toBeLessThan(312);
@@ -81,6 +87,7 @@ describe('round loop through the store (User Story 1)', () => {
     // The second round deals from what the first left behind, so the shoe keeps
     // depleting. A reshuffle every hand would put this back to ~308.
     store().deal(43);
+    store().collapseBotTurns();
     store().act('stand');
     expect(store().carriedShoe!.length).toBeLessThan(afterFirst);
   });
@@ -92,8 +99,10 @@ describe('round loop through the store (User Story 1)', () => {
 
   it('FR-015: dealing twice does not start a second round over the first', () => {
     store().deal(42);
+    store().collapseBotTurns();
     const first = store().round;
     store().deal(99);
+    store().collapseBotTurns();
     expect(store().round).toBe(first);
   });
 
@@ -102,6 +111,7 @@ describe('round loop through the store (User Story 1)', () => {
     for (let seed = 1; seed <= 10; seed++) {
       store().setBet(10);
       store().deal(seed);
+      store().collapseBotTurns();
       while (store().legalActions().length > 0) {
         store().act('stand');
       }
