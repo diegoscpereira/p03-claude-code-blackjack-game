@@ -5,6 +5,11 @@ import { settle } from '../engine/settle';
 import { legalActions } from '../engine/rules';
 import { DEFAULT_BET, PHASE_1_RULES, STARTING_BANKROLL } from '../engine/rules-config';
 import { nextSeed } from './seeds';
+import {
+  readTutorialState,
+  writeTutorialState,
+  type TutorialState,
+} from '../ui/tutorial/tutorialState';
 import type { Action, Card, RoundState, SettledRound } from '../engine/types';
 
 /**
@@ -31,12 +36,20 @@ export interface GameState {
   carriedShoe: readonly Card[] | null;
   carriedShoeSize: number;
 
+  tutorial: TutorialState;
+  /** Whether the tutorial surface is currently open (not persisted). */
+  tutorialOpen: boolean;
+
   setBet: (amount: number) => void;
   deal: (seed?: number) => void;
   act: (action: Action) => void;
   legalActions: () => Action[];
   canResetBankroll: () => boolean;
   resetBankroll: () => void;
+  dismissTutorial: () => void;
+  openTutorial: () => void;
+  completeTutorial: () => void;
+  setTutorialStep: (step: number) => void;
   reset: () => void;
 }
 
@@ -51,6 +64,8 @@ const initialState = () => ({
   lastSettled: null,
   carriedShoe: null,
   carriedShoeSize: 0,
+  tutorial: readTutorialState(),
+  tutorialOpen: false,
 });
 
 /**
@@ -141,8 +156,33 @@ function bankrollActions(set: Set, get: Get) {
   };
 }
 
+function tutorialActions(set: Set, get: Get) {
+  return {
+    /**
+     * FR-042: exits to the live table immediately — no confirmation, no
+     * intermediate screen. The write happens now rather than on unmount, so a
+     * player who dismisses and instantly closes the tab still gets FR-043.
+     */
+    dismissTutorial: (): void => {
+      set({ tutorial: writeTutorialState({ dismissed: true }), tutorialOpen: false });
+    },
+
+    openTutorial: (): void => set({ tutorialOpen: true }),
+
+    completeTutorial: (): void => {
+      set({ tutorial: writeTutorialState({ completed: true }), tutorialOpen: false });
+    },
+
+    /** FR-046: remembers the last completed step for a later resume. */
+    setTutorialStep: (step: number): void => {
+      set({ tutorial: writeTutorialState({ lastStep: Math.max(step, get().tutorial.lastStep) }) });
+    },
+  };
+}
+
 export const useGameStore = create<GameState>()((set, get) => ({
   ...initialState(),
   ...roundActions(set, get),
   ...bankrollActions(set, get),
+  ...tutorialActions(set, get),
 }));

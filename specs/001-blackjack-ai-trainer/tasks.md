@@ -112,17 +112,17 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 2 (REQUIRED - write first) ⚠️
 
-- [ ] T046 [P] [US2] Unit test tutorial state persistence in `tests/unit/tutorial-state.test.ts`: dismissed, completed, and `lastStep` round-trip through `localStorage` (FR-043, FR-046)
-- [ ] T047 [P] [US2] Component test in `tests/integration/tutorial-offer.test.tsx` asserting the dismiss control is present, keyboard-reachable, and requires no confirmation (FR-041, FR-042)
-- [ ] T048 [US2] End-to-end test in `tests/e2e/tutorial-skip.spec.ts` covering dismiss-in-one-interaction, no reappearance after reload, and all features unlocked (SC-002, SC-009)
+- [X] T046 [P] [US2] Unit test tutorial state persistence in `tests/unit/tutorial-state.test.ts`: dismissed, completed, and `lastStep` round-trip through `localStorage` (FR-043, FR-046)
+- [X] T047 [P] [US2] Component test in `tests/integration/tutorial-offer.test.tsx` asserting the dismiss control is present, keyboard-reachable, and requires no confirmation (FR-041, FR-042)
+- [X] T048 [US2] End-to-end test in `tests/e2e/tutorial-skip.spec.ts` covering dismiss-in-one-interaction, no reappearance after reload, and all features unlocked (SC-002, SC-009)
 
 ### Implementation for User Story 2
 
-- [ ] T049 [P] [US2] Implement tutorial state read/write in `src/ui/tutorial/tutorialState.ts` backed by the `bj.tutorial` localStorage key (data-model.md Part 3)
-- [ ] T050 [US2] Build the `TutorialOffer` component in `src/ui/tutorial/TutorialOffer.tsx` with a dismiss control visible without scrolling and reachable by keyboard (FR-040, FR-041)
-- [ ] T051 [US2] Wire dismissal in `src/store/gameStore.ts` to exit immediately to the live table with no confirmation and no intermediate screen (FR-042)
-- [ ] T052 [P] [US2] Add a help menu entry in `src/ui/common/HelpMenu.tsx` making the tutorial available on demand at any time (FR-044)
-- [ ] T053 [US2] Audit every feature surface for tutorial gating and confirm none exists, recording the check in `tests/e2e/tutorial-skip.spec.ts` (FR-045)
+- [X] T049 [P] [US2] Implement tutorial state read/write in `src/ui/tutorial/tutorialState.ts` backed by the `bj.tutorial` localStorage key (data-model.md Part 3)
+- [X] T050 [US2] Build the `TutorialOffer` component in `src/ui/tutorial/TutorialOffer.tsx` with a dismiss control visible without scrolling and reachable by keyboard (FR-040, FR-041)
+- [X] T051 [US2] Wire dismissal in `src/store/gameStore.ts` to exit immediately to the live table with no confirmation and no intermediate screen (FR-042)
+- [X] T052 [P] [US2] Add a help menu entry in `src/ui/common/HelpMenu.tsx` making the tutorial available on demand at any time (FR-044)
+- [X] T053 [US2] Audit every feature surface for tutorial gating and confirm none exists, recording the check in `tests/e2e/tutorial-skip.spec.ts` (FR-045)
 
 **Checkpoint**: Both P1 stories complete. The product is viable for experienced players.
 
