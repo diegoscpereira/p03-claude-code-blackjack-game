@@ -1,0 +1,35 @@
+{
+  "_comment": "T072 — authored rationale families (research.md R7). Roughly 370 charted decision points share far fewer distinct reasons, so the library stores the reasons and src/strategy/explanations.ts selects one from hand shape, dealer upcard and action. Placeholders are filled at lookup time and the result is deterministic (FR-029). Committed rather than generated: this is content, and it should be reviewable in a diff.",
+
+  "stand": {
+    "pat": "Your {hand} is already strong. Any card that improves it is outnumbered by the ones that bust it, so stand and make the dealer beat {total}.",
+    "dealerWeak": "You hold {hand} against a dealer {upcard}. That upcard is weak — the dealer must keep drawing to 17 and busts often from it — so stand and let them take the risk instead of you.",
+    "softStrong": "Your {hand} is a winning total on its own. Drawing here gives up more than it gains against a dealer {upcard}.",
+    "pairTens": "Two ten-value cards make {total}, which beats almost everything the dealer can finish with. Splitting trades one very strong hand for two ordinary ones.",
+    "nineVsSeven": "Your {total} against a dealer {upcard} is already ahead: a {upcard} most often finishes on 17. Splitting risks that lead for no gain.",
+    "fallback": "Standing on {hand} against a dealer {upcard} loses less often than any alternative here."
+  },
+
+  "hit": {
+    "cannotBust": "You cannot bust {hand} — no single card takes it over 21 — so there is nothing to lose by taking one against a dealer {upcard}.",
+    "mustImprove": "Your {hand} loses to almost everything the dealer makes with a {upcard}. Standing keeps a losing total; taking a card is the lesser risk even though it often busts.",
+    "softImprove": "{Hand} can take a card without busting, and {total} is not enough to beat a dealer {upcard}. Hitting can only improve the hand or leave it playable.",
+    "lowTotal": "At {total} there is no card in the shoe that can bust you, so take one.",
+    "pairNotWorthSplitting": "Splitting this pair against a dealer {upcard} would turn one weak hand into two. Play it as a single {hand} and take a card.",
+    "fallback": "Taking a card on {hand} against a dealer {upcard} wins more often than standing on it."
+  },
+
+  "double": {
+    "strongVsWeak": "Your {hand} is a strong starting total and the dealer's {upcard} is weak. Doubling puts more money in exactly when you are most likely to win, at the cost of taking only one more card.",
+    "eleven": "{Total} is the best doubling total in the game: every ten-value card makes 21, and the dealer's {upcard} cannot punish you often enough to matter.",
+    "soft": "{Hand} risks very little by doubling — the Ace protects you from busting on the one card you take — and a dealer {upcard} busts often enough to make the extra bet worth it.",
+    "fallback": "Doubling {hand} against a dealer {upcard} earns more than hitting it, because you are favoured here and only need one card."
+  },
+
+  "split": {
+    "acesOrEights": "Always split these. {Hand} is a poor total to play as one hand, and each card is a strong start on its own — two hands beginning with {splitCard} are worth far more than one {total}.",
+    "vsWeak": "Splitting {hand} against a dealer {upcard} turns one mediocre total into two hands that each start against a weak upcard the dealer will often bust from.",
+    "doubleAfterSplit": "These house rules allow doubling after a split, which is what makes splitting {hand} against a dealer {upcard} pay — each new hand can press its advantage.",
+    "fallback": "Splitting {hand} against a dealer {upcard} is worth more than playing it as a single hand."
+  }
+}

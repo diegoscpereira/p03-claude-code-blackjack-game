@@ -45,8 +45,33 @@ export function HelpMenu() {
           >
             {resumes ? `Resume tutorial (step ${tutorial.lastStep + 1})` : 'Open the tutorial'}
           </button>
+
+          <CompanionToggle />
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * T077 — FR-026: hides the advice during play while still recording whether
+ * each decision matched, so the post-game analysis stays complete and the
+ * accuracy score cannot be inflated by simply turning the companion off.
+ */
+function CompanionToggle() {
+  const enabled = useGameStore((s) => s.companionEnabled);
+  const setEnabled = useGameStore((s) => s.setCompanionEnabled);
+
+  return (
+    <label className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-ink hover:bg-felt">
+      <input
+        type="checkbox"
+        data-testid="companion-toggle"
+        checked={enabled}
+        onChange={(event) => setEnabled(event.target.checked)}
+        className="h-4 w-4 accent-accent"
+      />
+      Show strategy advice
+    </label>
   );
 }

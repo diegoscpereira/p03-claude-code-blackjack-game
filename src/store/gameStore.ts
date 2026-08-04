@@ -10,7 +10,11 @@ import {
   writeTutorialState,
   type TutorialState,
 } from '../ui/tutorial/tutorialState';
-import type { Action, Card, RoundState, SettledRound } from '../engine/types';
+import { handTotal } from '../engine/hand';
+import { evDifference, rankActions, recommend } from '../strategy/ev';
+import { upcardKey } from '../strategy/shape';
+import type { Action, Card, Decision, Rank, RoundState, SettledRound } from '../engine/types';
+import type { RankedAction } from '../strategy/ev';
 
 /**
  * T037 — the client store.
@@ -40,6 +44,20 @@ export interface GameState {
   /** Whether the tutorial surface is currently open (not persisted). */
   tutorialOpen: boolean;
 
+  /** FR-026: hides advice without stopping the match data being recorded. */
+  companionEnabled: boolean;
+  /** The most recent player decision, for the companion's feedback line. */
+  lastDecision: Decision | null;
+  /** How much EV the last decision gave up, if it was not the recommendation. */
+  lastEvGiveUp: number | null;
+  /** FR-024a: the two counters the EV accuracy score is derived from. */
+  decisionsTaken: number;
+  decisionsMatched: number;
+
+  rankedActions: () => RankedAction[];
+  recommendation: () => Action | null;
+  setCompanionEnabled: (enabled: boolean) => void;
+
   setBet: (amount: number) => void;
   deal: (seed?: number) => void;
   act: (action: Action) => void;
@@ -66,6 +84,11 @@ const initialState = () => ({
   carriedShoeSize: 0,
   tutorial: readTutorialState(),
   tutorialOpen: false,
+  companionEnabled: true,
+  lastDecision: null,
+  lastEvGiveUp: null,
+  decisionsTaken: 0,
+  decisionsMatched: 0,
 });
 
 /**
@@ -114,20 +137,84 @@ function roundActions(set: Set, get: Get) {
       const { round } = get();
       if (!round) return;
 
+      // Snapshot the advice *before* the action changes the state.
+      const decision = describeDecision(round, action);
+      const giveUp = evDifference(round, rules, action);
+
       const next = applyAction(round, action, rules);
       // The engine returns the same reference for an illegal action (FR-015),
       // so this is the double-click guard — no separate UI lock needed.
       if (next === round) return;
 
+      if (decision) recordDecision(set, get, decision, giveUp);
+
       if (next.phase === 'player') set({ round: next });
       else finish(next);
     },
 
+  };
+}
+
+/** Derived views over the current round. No state of their own. */
+function selectors(get: Get) {
+  return {
     legalActions: (): Action[] => {
       const { round } = get();
       return round ? legalActions(round, rules) : [];
     },
+
+    rankedActions: (): RankedAction[] => {
+      const { round } = get();
+      return round ? rankActions(round, rules) : [];
+    },
+
+    recommendation: (): Action | null => {
+      const { round } = get();
+      return round ? recommend(round, rules) : null;
+    },
   };
+}
+
+/**
+ * T076 — FR-024, FR-024a: what the player chose against what was advised.
+ *
+ * Returns null for anything the player did not actively choose. The engine's
+ * forced split-Ace stand never reaches `act`, so the exclusion FR-024a requires
+ * is structural, but a state with no hand to act on is guarded here.
+ */
+function describeDecision(round: RoundState, chosen: Action): Decision | null {
+  const hand = round.playerHands[round.activeHandIndex];
+  const upcard = round.dealerHand.cards[0];
+  if (!hand || !upcard) return null;
+
+  const advised = recommend(round, rules);
+  if (!advised) return null;
+
+  const { total, isSoft } = handTotal(hand.cards);
+  return {
+    handId: hand.id,
+    playerTotal: total,
+    isSoft,
+    dealerUpcard: upcardKey(upcard.rank) as Rank,
+    chosen,
+    recommended: advised,
+    matched: chosen === advised,
+  };
+}
+
+/**
+ * FR-024a: counts every decision the player made, *including* ones made while
+ * the companion was hidden (FR-026). Hiding the advice changes what is shown,
+ * never what is scored — otherwise the accuracy figure would quietly reward
+ * turning the companion off.
+ */
+function recordDecision(set: Set, get: Get, decision: Decision, giveUp: number | null): void {
+  set({
+    lastDecision: decision,
+    lastEvGiveUp: decision.matched ? null : giveUp,
+    decisionsTaken: get().decisionsTaken + 1,
+    decisionsMatched: get().decisionsMatched + (decision.matched ? 1 : 0),
+  });
 }
 
 function bankrollActions(set: Set, get: Get) {
@@ -151,6 +238,9 @@ function bankrollActions(set: Set, get: Get) {
         bankrollResets: get().bankrollResets + 1,
       });
     },
+
+    /** FR-026: hides the advice; the match data keeps being recorded. */
+    setCompanionEnabled: (enabled: boolean): void => set({ companionEnabled: enabled }),
 
     reset: (): void => set(initialState()),
   };
@@ -183,6 +273,7 @@ function tutorialActions(set: Set, get: Get) {
 export const useGameStore = create<GameState>()((set, get) => ({
   ...initialState(),
   ...roundActions(set, get),
+  ...selectors(get),
   ...bankrollActions(set, get),
   ...tutorialActions(set, get),
 }));

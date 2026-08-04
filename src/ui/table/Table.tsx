@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { HandView } from './Hand';
 import { Controls } from './Controls';
 import { Bankroll } from './Bankroll';
+import { CompanionPanel } from '../companion/CompanionPanel';
 import { ACTION_KEYS } from './actionReasons';
 import { useDealPacing } from './useDealPacing';
 import { useGameStore } from '../../store/gameStore';
@@ -46,6 +47,7 @@ export function Table() {
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4">
       <Bankroll />
       <Felt revealed={revealed} />
+      <CompanionPanel />
       <Outcome />
 
       {canDeal ? (

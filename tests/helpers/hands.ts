@@ -130,3 +130,33 @@ export function round(overrides: RoundOverrides = {}): RoundState {
 export function describeCards(list: readonly Card[]): string {
   return list.map((c) => c.rank).join(',');
 }
+
+/**
+ * Cards that produce a chart shape (`hard-16`, `soft-18`, `pair-8`).
+ *
+ * Two cards wherever two cards can make the shape, because that is the case the
+ * chart is written for — a two-card hand is the only one where Double and Split
+ * are legal at all. Hard 20 is the exception: no two *unequal* cards reach it,
+ * so it needs three, which is also the only way to hold a non-pair hard 20.
+ */
+export function cardsForShape(shape: string): string {
+  const [kind, value] = shape.split('-') as [string, string];
+
+  if (kind === 'pair') return `${value},${value}`;
+  if (kind === 'soft') return `A,${Number(value) - 11}`;
+
+  const total = Number(value);
+  for (let first = 2; first <= 10; first++) {
+    const second = total - first;
+    if (second >= 2 && second <= 10 && second !== first) return `${first},${second}`;
+  }
+
+  for (let first = 10; first >= 2; first--) {
+    for (let second = first - 1; second >= 2; second--) {
+      const third = total - first - second;
+      if (third >= 2 && third <= 10) return `${first},${second},${third}`;
+    }
+  }
+
+  throw new Error(`No card combination produces ${shape}`);
+}

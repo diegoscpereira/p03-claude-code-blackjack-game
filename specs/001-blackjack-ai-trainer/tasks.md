@@ -160,26 +160,26 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 4 (REQUIRED - write first) ⚠️
 
-- [ ] T062 [P] [US4] Unit test the EV generator against published EV figures for the T014 rule set in `tests/unit/strategy/ev-generator.test.ts` — a mismatch is a generator bug, never a chart disagreement (research.md R1)
-- [ ] T063 [P] [US4] Table-driven unit test in `tests/unit/strategy/chart.test.ts` asserting `recommend()` matches the T019 reference chart at **every** charted decision point, not a sample (FR-021, SC-003)
-- [ ] T064 [P] [US4] Unit test in `tests/unit/strategy/ev.test.ts` asserting `rankActions` returns one entry per legal action, sorted descending, with `recommend()` equal to the top entry
-- [ ] T065 [P] [US4] Unit test explanation coverage in `tests/unit/strategy/explanations.test.ts` asserting 100% of charted decision points resolve to an entry, and that repeated lookups return identical text (FR-028, FR-029, SC-010)
-- [ ] T066 [P] [US4] Unit test that `explain()` returns `null` rather than placeholder text for an unmatched key (FR-027)
-- [ ] T067 [US4] Component test in `tests/integration/companion.test.tsx` asserting a non-recommended action proceeds without blocking and shows the EV difference (FR-025)
+- [X] T062 [P] [US4] Unit test the EV generator against published EV figures for the T014 rule set in `tests/unit/strategy/ev-generator.test.ts` — a mismatch is a generator bug, never a chart disagreement (research.md R1)
+- [X] T063 [P] [US4] Table-driven unit test in `tests/unit/strategy/chart.test.ts` asserting `recommend()` matches the T019 reference chart at **every** charted decision point, not a sample (FR-021, SC-003)
+- [X] T064 [P] [US4] Unit test in `tests/unit/strategy/ev.test.ts` asserting `rankActions` returns one entry per legal action, sorted descending, with `recommend()` equal to the top entry
+- [X] T065 [P] [US4] Unit test explanation coverage in `tests/unit/strategy/explanations.test.ts` asserting 100% of charted decision points resolve to an entry, and that repeated lookups return identical text (FR-028, FR-029, SC-010)
+- [X] T066 [P] [US4] Unit test that `explain()` returns `null` rather than placeholder text for an unmatched key (FR-027)
+- [X] T067 [US4] Component test in `tests/integration/companion.test.tsx` asserting a non-recommended action proceeds without blocking and shows the EV difference (FR-025)
 
 ### Implementation for User Story 4
 
-- [ ] T068 [US4] Write the exact EV solver in `scripts/generate-ev-tables.ts` computing dealer outcome probabilities and per-action EV for every player shape and dealer upcard (research.md R1)
-- [ ] T069 [US4] Generate `src/strategy/data/ev-tables.json` via `npm run generate:ev` and verify size stays within the first-load budget (~40KB, NFR-004)
-- [ ] T070 [P] [US4] Implement the basic strategy lookup in `src/strategy/chart.ts`
-- [ ] T071 [US4] Implement `rankActions` and `recommend` in `src/strategy/ev.ts` as synchronous table lookups with no computation and no await (NFR-002)
-- [ ] T072 [US4] Author explanation rationale families and expand across the chart into `src/strategy/data/explanations.json` (research.md R7)
-- [ ] T073 [US4] Implement `explain()` lookup in `src/strategy/explanations.ts` keyed by hand shape, dealer upcard, and action (FR-023)
-- [ ] T074 [US4] Build the companion panel in `src/ui/companion/CompanionPanel.tsx` listing each legal action with its EV and marking the recommendation (FR-022)
-- [ ] T075 [P] [US4] Build the explanation display in `src/ui/companion/Explanation.tsx`, rendering nothing when `explain()` returns `null` (FR-027)
-- [ ] T076 [US4] Record `Decision` entries in `src/store/gameStore.ts` on every player action, excluding automatic split-Ace stands (FR-024, FR-024a)
-- [ ] T077 [P] [US4] Add a companion-disabled setting that still records match data but hides advice (FR-026)
-- [ ] T078 [P] [US4] Write ADR in `docs/adr/0001-precomputed-ev-tables.md` recording the decision and the rejected runtime solver
+- [X] T068 [US4] Write the exact EV solver in `scripts/generate-ev-tables.ts` computing dealer outcome probabilities and per-action EV for every player shape and dealer upcard (research.md R1)
+- [X] T069 [US4] Generate `src/strategy/data/ev-tables.json` via `npm run generate:ev` and verify size stays within the first-load budget (~40KB, NFR-004)
+- [X] T070 [P] [US4] Implement the basic strategy lookup in `src/strategy/chart.ts`
+- [X] T071 [US4] Implement `rankActions` and `recommend` in `src/strategy/ev.ts` as synchronous table lookups with no computation and no await (NFR-002)
+- [X] T072 [US4] Author explanation rationale families and expand across the chart into `src/strategy/data/explanations.json` (research.md R7)
+- [X] T073 [US4] Implement `explain()` lookup in `src/strategy/explanations.ts` keyed by hand shape, dealer upcard, and action (FR-023)
+- [X] T074 [US4] Build the companion panel in `src/ui/companion/CompanionPanel.tsx` listing each legal action with its EV and marking the recommendation (FR-022)
+- [X] T075 [P] [US4] Build the explanation display in `src/ui/companion/Explanation.tsx`, rendering nothing when `explain()` returns `null` (FR-027)
+- [X] T076 [US4] Record `Decision` entries in `src/store/gameStore.ts` on every player action, excluding automatic split-Ace stands (FR-024, FR-024a)
+- [X] T077 [P] [US4] Add a companion-disabled setting that still records match data but hides advice (FR-026)
+- [X] T078 [P] [US4] Write ADR in `docs/adr/0001-precomputed-ev-tables.md` recording the decision and the rejected runtime solver
 
 **Checkpoint**: The differentiating feature works and is provably correct against the chart.
 

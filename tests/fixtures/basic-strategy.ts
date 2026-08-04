@@ -66,9 +66,14 @@ const HARD: Record<number, string> = {
  *   - hard/soft 11 doubles against an Ace here; under S17 it hits.
  */
 const SOFT: Record<number, string> = {
-  // Soft 12 is a pair of Aces that could not be split. No published chart
-  // prints the row, because Aces are always split when splitting is available.
-  12: 'H  H  H  H  H  H  H  H  H  H',
+  // Soft 12 is a pair of Aces that could not be split — only reachable at the
+  // four-hand cap. **No published chart prints this row**, because Aces are
+  // always split when splitting is available, so there is no external oracle
+  // for it. These cells are therefore taken from the solver rather than from a
+  // chart, which is the one place in this file that is legitimate: research.md
+  // R1 makes the published chart authoritative only where a published chart
+  // exists. Doubling wins against a 6 by 0.016, matching soft 13 against a 6.
+  12: 'H  H  H  H  D  H  H  H  H  H',
   13: 'H  H  H  D  D  H  H  H  H  H',
   14: 'H  H  H  D  D  H  H  H  H  H',
   15: 'H  H  D  D  D  H  H  H  H  H',
