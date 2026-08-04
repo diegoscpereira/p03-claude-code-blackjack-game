@@ -71,34 +71,34 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 > Write these FIRST and observe them FAIL before implementing.
 
-- [ ] T021 [P] [US1] Unit test hand totals and soft/hard aces in `tests/unit/engine/hand.test.ts`, covering the table in contracts/engine-api.md (FR-001)
-- [ ] T022 [P] [US1] Unit test shoe construction, Fisher–Yates shuffle, draw, and penetration in `tests/unit/engine/shoe.test.ts` (FR-016)
-- [ ] T023 [P] [US1] Unit test `legalActions` for every phase and hand shape in `tests/unit/engine/rules.test.ts`, including double-without-bankroll and the 4-hand split cap (FR-002, FR-010)
-- [ ] T024 [P] [US1] Unit test round reducer transitions for Hit, Stand, and Double in `tests/unit/engine/round.test.ts`, asserting input state is never mutated (FR-006, FR-007, FR-008)
-- [ ] T025 [P] [US1] Unit test split, resplit to the 4-hand cap, and split-Ace one-card-and-stand in `tests/unit/engine/split.test.ts` (FR-009, FR-010, FR-011)
-- [ ] T026 [P] [US1] Unit test dealer play drawing to hard 17 and hitting soft 17 in `tests/unit/engine/dealer.test.ts` (FR-012)
-- [ ] T027 [P] [US1] Unit test settlement in `tests/unit/engine/settle.test.ts`: 3:2 naturals, 1:1 wins, pushes, busts, and the invariant that per-hand payouts sum to the round total (FR-013)
-- [ ] T028 [P] [US1] Unit test that an illegal action returns the state unchanged rather than throwing, in `tests/unit/engine/rules.test.ts` (FR-015, contracts/engine-api.md totality rule)
-- [ ] T029 [P] [US1] Unit test full-round determinism from a fixed seed in `tests/unit/engine/determinism.test.ts` (FR-004, SC-008)
-- [ ] T030 [US1] Integration test driving a complete round through the store in `tests/integration/round-loop.test.ts`: bet → deal → actions → dealer → settle → bankroll updated
+- [X] T021 [P] [US1] Unit test hand totals and soft/hard aces in `tests/unit/engine/hand.test.ts`, covering the table in contracts/engine-api.md (FR-001)
+- [X] T022 [P] [US1] Unit test shoe construction, Fisher–Yates shuffle, draw, and penetration in `tests/unit/engine/shoe.test.ts` (FR-016)
+- [X] T023 [P] [US1] Unit test `legalActions` for every phase and hand shape in `tests/unit/engine/rules.test.ts`, including double-without-bankroll and the 4-hand split cap (FR-002, FR-010)
+- [X] T024 [P] [US1] Unit test round reducer transitions for Hit, Stand, and Double in `tests/unit/engine/round.test.ts`, asserting input state is never mutated (FR-006, FR-007, FR-008)
+- [X] T025 [P] [US1] Unit test split, resplit to the 4-hand cap, and split-Ace one-card-and-stand in `tests/unit/engine/split.test.ts` (FR-009, FR-010, FR-011)
+- [X] T026 [P] [US1] Unit test dealer play drawing to hard 17 and hitting soft 17 in `tests/unit/engine/dealer.test.ts` (FR-012)
+- [X] T027 [P] [US1] Unit test settlement in `tests/unit/engine/settle.test.ts`: 3:2 naturals, 1:1 wins, pushes, busts, and the invariant that per-hand payouts sum to the round total (FR-013)
+- [X] T028 [P] [US1] Unit test that an illegal action returns the state unchanged rather than throwing, in `tests/unit/engine/rules.test.ts` (FR-015, contracts/engine-api.md totality rule)
+- [X] T029 [P] [US1] Unit test full-round determinism from a fixed seed in `tests/unit/engine/determinism.test.ts` (FR-004, SC-008)
+- [X] T030 [US1] Integration test driving a complete round through the store in `tests/integration/round-loop.test.ts`: bet → deal → actions → dealer → settle → bankroll updated
 
 ### Implementation for User Story 1
 
-- [ ] T031 [P] [US1] Implement `handTotal`, `isBust`, and `isNatural` in `src/engine/hand.ts`
-- [ ] T032 [P] [US1] Implement shoe build, shuffle, draw, and penetration check in `src/engine/shoe.ts`
-- [ ] T033 [US1] Implement `legalActions` in `src/engine/rules.ts` (depends on T031)
-- [ ] T034 [US1] Implement `startRound` and `applyAction` reducer in `src/engine/round.ts` (depends on T031, T032, T033)
-- [ ] T035 [US1] Implement `playDealer` in `src/engine/dealer.ts` (depends on T031)
-- [ ] T036 [US1] Implement `settle` and `SettledRound` emission including the hand log record in `src/engine/settle.ts` (FR-014)
-- [ ] T037 [US1] Implement the Zustand store in `src/store/gameStore.ts` holding `RoundState`, bankroll, and bet, with actions dispatching to the engine reducer
-- [ ] T038 [P] [US1] Build the `Card` component in `src/ui/table/Card.tsx` with a face-down state for the dealer hole card
-- [ ] T039 [P] [US1] Build the `Hand` component in `src/ui/table/Hand.tsx` showing cards and the derived total
-- [ ] T040 [US1] Build the `Controls` component in `src/ui/table/Controls.tsx` rendering only `legalActions`, disabling unavailable actions with a stated reason (FR-002, Principle III)
-- [ ] T041 [P] [US1] Build the `Bankroll` and bet controls in `src/ui/table/Bankroll.tsx`, including the zero-bankroll reset offer (FR-055)
-- [ ] T042 [US1] Build the `Table` component in `src/ui/table/Table.tsx` composing hands, dealer, controls, and bankroll so all board state is visible at every decision point (Principle III)
-- [ ] T043 [US1] Wire `src/App.tsx` and `src/main.tsx` to render the table and start a round
-- [ ] T044 [US1] Add deal/draw animation as cancellable pacing in `src/ui/table/Table.tsx`, excluded from the 100ms budget but interruptible by input (NFR-001, Principle IV)
-- [ ] T045 [US1] End-to-end test playing a full hand in `tests/e2e/play-hand.spec.ts` (quickstart V1)
+- [X] T031 [P] [US1] Implement `handTotal`, `isBust`, and `isNatural` in `src/engine/hand.ts`
+- [X] T032 [P] [US1] Implement shoe build, shuffle, draw, and penetration check in `src/engine/shoe.ts`
+- [X] T033 [US1] Implement `legalActions` in `src/engine/rules.ts` (depends on T031)
+- [X] T034 [US1] Implement `startRound` and `applyAction` reducer in `src/engine/round.ts` (depends on T031, T032, T033)
+- [X] T035 [US1] Implement `playDealer` in `src/engine/dealer.ts` (depends on T031)
+- [X] T036 [US1] Implement `settle` and `SettledRound` emission including the hand log record in `src/engine/settle.ts` (FR-014)
+- [X] T037 [US1] Implement the Zustand store in `src/store/gameStore.ts` holding `RoundState`, bankroll, and bet, with actions dispatching to the engine reducer
+- [X] T038 [P] [US1] Build the `Card` component in `src/ui/table/Card.tsx` with a face-down state for the dealer hole card
+- [X] T039 [P] [US1] Build the `Hand` component in `src/ui/table/Hand.tsx` showing cards and the derived total
+- [X] T040 [US1] Build the `Controls` component in `src/ui/table/Controls.tsx` rendering only `legalActions`, disabling unavailable actions with a stated reason (FR-002, Principle III)
+- [X] T041 [P] [US1] Build the `Bankroll` and bet controls in `src/ui/table/Bankroll.tsx`, including the zero-bankroll reset offer (FR-055)
+- [X] T042 [US1] Build the `Table` component in `src/ui/table/Table.tsx` composing hands, dealer, controls, and bankroll so all board state is visible at every decision point (Principle III)
+- [X] T043 [US1] Wire `src/App.tsx` and `src/main.tsx` to render the table and start a round
+- [X] T044 [US1] Add deal/draw animation as cancellable pacing in `src/ui/table/Table.tsx`, excluded from the 100ms budget but interruptible by input (NFR-001, Principle IV)
+- [X] T045 [US1] End-to-end test playing a full hand in `tests/e2e/play-hand.spec.ts` (quickstart V1)
 
 **Checkpoint**: A playable, correct Blackjack game. This is the MVP — stop and validate here.
 
