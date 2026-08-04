@@ -1,6 +1,6 @@
 import { Table } from './ui/table/Table';
 import { TutorialOffer } from './ui/tutorial/TutorialOffer';
-import { TutorialPanel } from './ui/tutorial/TutorialPanel';
+import { TutorialRunner } from './ui/tutorial/TutorialRunner';
 import { HelpMenu } from './ui/common/HelpMenu';
 
 /** T043 — the application shell. */
@@ -23,7 +23,7 @@ export default function App() {
         {/* FR-041: the offer sits above the table, in the first viewport, so
             its dismiss control is reachable without scrolling. */}
         <TutorialOffer />
-        <TutorialPanel />
+        <TutorialRunner />
         <Table />
       </main>
     </div>

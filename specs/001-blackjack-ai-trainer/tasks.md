@@ -136,17 +136,17 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 3 (REQUIRED - write first) ⚠️
 
-- [ ] T054 [P] [US3] Unit test lesson sequencing and step advancement in `tests/unit/tutorial-steps.test.ts`
-- [ ] T055 [P] [US3] Component test in `tests/integration/tutorial-step.test.tsx` asserting the taught action is highlighted and a reason is shown (FR-047)
-- [ ] T056 [US3] End-to-end test in `tests/e2e/tutorial-complete.spec.ts` covering full completion and mid-tutorial resume from the help menu (FR-046)
+- [X] T054 [P] [US3] Unit test lesson sequencing and step advancement in `tests/unit/tutorial-steps.test.ts`
+- [X] T055 [P] [US3] Component test in `tests/integration/tutorial-step.test.tsx` asserting the taught action is highlighted and a reason is shown (FR-047)
+- [X] T056 [US3] End-to-end test in `tests/e2e/tutorial-complete.spec.ts` covering full completion and mid-tutorial resume from the help menu (FR-046)
 
 ### Implementation for User Story 3
 
-- [ ] T057 [P] [US3] Define the fixed linear lesson sequence in `src/ui/tutorial/lessons.ts`: card values, hand totals, soft vs hard, dealer rules, and each of the four actions (spec Assumption 6)
-- [ ] T058 [US3] Implement the guided-hand runner in `src/ui/tutorial/TutorialRunner.tsx` using scripted seeds so each lesson deals a predetermined hand
-- [ ] T059 [US3] Implement step highlighting and rationale display in `src/ui/tutorial/LessonStep.tsx` (FR-047)
-- [ ] T060 [US3] Implement resume-from-last-completed-step on re-entry in `src/ui/tutorial/tutorialState.ts` (FR-046)
-- [ ] T061 [US3] Ensure the dismiss control appears on every tutorial surface, not just the offer (FR-041, SC-009)
+- [X] T057 [P] [US3] Define the fixed linear lesson sequence in `src/ui/tutorial/lessons.ts`: card values, hand totals, soft vs hard, dealer rules, and each of the four actions (spec Assumption 6)
+- [X] T058 [US3] Implement the guided-hand runner in `src/ui/tutorial/TutorialRunner.tsx` using scripted seeds so each lesson deals a predetermined hand
+- [X] T059 [US3] Implement step highlighting and rationale display in `src/ui/tutorial/LessonStep.tsx` (FR-047)
+- [X] T060 [US3] Implement resume-from-last-completed-step on re-entry in `src/ui/tutorial/tutorialState.ts` (FR-046)
+- [X] T061 [US3] Ensure the dismiss control appears on every tutorial surface, not just the offer (FR-041, SC-009)
 
 **Checkpoint**: Beginners can learn; experienced players remain unblocked.
 
