@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-felt-deep text-ink font-sans antialiased;
+  }
+
+  /* NFR-008: focus must always be visible, including for keyboard-only play.
+     `accent` on either surface clears the 3:1 non-text contrast threshold. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-felt-deep;
+  }
+}
+
+@layer utilities {
+  /* Deal and draw pacing is presentation only. Anyone who has asked the system
+     not to animate gets the result instantly — which is also the behaviour the
+     100ms budget assumes (NFR-001). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

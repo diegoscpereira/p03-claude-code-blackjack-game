@@ -1,4 +1,4 @@
----
+﻿---
 
 description: "Task list for Web-Based Blackjack AI Trainer"
 ---
@@ -25,18 +25,18 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 **Purpose**: Scaffold the project and stand up every quality gate before any feature code exists. Gates that arrive late never get enforced.
 
-- [ ] T001 Scaffold Vite + React 18 + TypeScript project at the **git repository root** (`jornada_de_dados_claude_code_projeto03/`). Move `.specify/`, `.claude/`, and `specs/` up from `claude_code_blackjack_project/` to that root, delete the Python placeholder scaffold (`main.py`, `pyproject.toml`, `.python-version`), and remove the emptied `claude_code_blackjack_project/` directory. All paths in this file are relative to that root
-- [ ] T002 Configure strict TypeScript in `tsconfig.json` with `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, and `noUnusedLocals` enabled
-- [ ] T003 [P] Install and configure Tailwind CSS in `tailwind.config.ts` and `src/index.css`, defining colour tokens that meet WCAG 2.1 AA contrast
-- [ ] T004 [P] Configure Vitest in `vite.config.ts` with a Node environment for `tests/unit` and jsdom for `tests/integration`
-- [ ] T005 [P] Configure V8 coverage in `vite.config.ts` with a hard 90% line threshold scoped to `src/engine/**` and `src/strategy/**`
-- [ ] T006 [P] Configure Playwright in `playwright.config.ts` with a headless CI project and a separate `test:e2e` script
-- [ ] T007 Configure ESLint and Prettier in `eslint.config.js`, including the `no-restricted-imports` zone rule forbidding `src/engine/**` and `src/strategy/**` from importing `react`, `zustand`, `src/ui/**`, `src/store/**`, `src/sync/**`, or `@supabase/*` (research.md R6). Also configure `max-lines: 400` and `max-lines-per-function: 50` so constitution Principle I's size caps fail CI rather than relying on review
-- [ ] T008 Add npm scripts to `package.json`: `dev`, `build`, `typecheck`, `lint`, `test:unit`, `test:integration`, `test:coverage`, `test:e2e`, `generate:ev`, `check:bundle`
-- [ ] T009 [P] Write `scripts/check-bundle.ts` asserting no `SUPABASE_SERVICE` string or service-key value appears in `dist/`, exiting non-zero on match
-- [ ] T010 [P] Create `.env.example` and `vercel.json` documenting server-side-only `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` with an explicit note that no `VITE_` prefix may be used
-- [ ] T011 [P] Create the directory skeleton `src/{engine,strategy,bots,progression,sync,store,ui}`, `api/`, `tests/{unit,integration,e2e}`, `docs/adr/`, `supabase/`
-- [ ] T012 Create `.github/workflows/ci.yml` running the six constitutional gates in order: typecheck → lint → unit+integration → coverage → check:bundle → e2e (e2e as a separate job)
+- [X] T001 Scaffold Vite + React 18 + TypeScript project at the **git repository root** (`jornada_de_dados_claude_code_projeto03/`). Move `.specify/`, `.claude/`, and `specs/` up from `claude_code_blackjack_project/` to that root, delete the Python placeholder scaffold (`main.py`, `pyproject.toml`, `.python-version`), and remove the emptied `claude_code_blackjack_project/` directory. All paths in this file are relative to that root
+- [X] T002 Configure strict TypeScript in `tsconfig.json` with `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, and `noUnusedLocals` enabled
+- [X] T003 [P] Install and configure Tailwind CSS in `tailwind.config.ts` and `src/index.css`, defining colour tokens that meet WCAG 2.1 AA contrast
+- [X] T004 [P] Configure Vitest in `vite.config.ts` with a Node environment for `tests/unit` and jsdom for `tests/integration`
+- [X] T005 [P] Configure V8 coverage in `vite.config.ts` with a hard 90% line threshold scoped to `src/engine/**` and `src/strategy/**`
+- [X] T006 [P] Configure Playwright in `playwright.config.ts` with a headless CI project and a separate `test:e2e` script
+- [X] T007 Configure ESLint and Prettier in `eslint.config.js`, including the `no-restricted-imports` zone rule forbidding `src/engine/**` and `src/strategy/**` from importing `react`, `zustand`, `src/ui/**`, `src/store/**`, `src/sync/**`, or `@supabase/*` (research.md R6). Also configure `max-lines: 400` and `max-lines-per-function: 50` so constitution Principle I's size caps fail CI rather than relying on review
+- [X] T008 Add npm scripts to `package.json`: `dev`, `build`, `typecheck`, `lint`, `test:unit`, `test:integration`, `test:coverage`, `test:e2e`, `generate:ev`, `check:bundle`
+- [X] T009 [P] Write `scripts/check-bundle.ts` asserting no `SUPABASE_SERVICE` string or service-key value appears in `dist/`, exiting non-zero on match
+- [X] T010 [P] Create `.env.example` and `vercel.json` documenting server-side-only `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` with an explicit note that no `VITE_` prefix may be used
+- [X] T011 [P] Create the directory skeleton `src/{engine,strategy,bots,progression,sync,store,ui}`, `api/`, `tests/{unit,integration,e2e}`, `docs/adr/`, `supabase/`
+- [X] T012 Create `.github/workflows/ci.yml` running the six constitutional gates in order: typecheck → lint → unit+integration → coverage → check:bundle → e2e (e2e as a separate job)
 
 **Checkpoint**: `npm run typecheck && npm run lint` passes on an empty project; CI is green.
 

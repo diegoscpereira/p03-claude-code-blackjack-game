@@ -1,0 +1,29 @@
+# Node / JavaScript / TypeScript
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.env
+.env.*
+!.env.example
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+.vitest/
+
+# Generated strategy tables — rebuild with `npm run generate:ev`
+src/strategy/data/ev-tables.json
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Vercel
+.vercel

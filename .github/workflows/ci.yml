@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# T012 — the six constitutional gates, in the order the constitution states them
+# (Development Workflow & Quality Gates). End-to-end tests are a separate job
+# because Principle IV requires they never gate the fast feedback loop.
+
+jobs:
+  gates:
+    name: Quality gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate strategy tables
+        run: npm run generate:ev
+
+      # Gate 2 — type checker passes with zero unjustified errors.
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Gate 1 — formatter and linter, including the engine import-boundary rule.
+      - name: Lint
+        run: npm run lint
+
+      # Gate 3 — full unit + integration suite.
+      # Gate 5 — the suite must stay under 30 seconds; the timeout enforces it.
+      - name: Unit and integration tests
+        timeout-minutes: 2
+        run: npm run test
+
+      # Gate 4 — coverage on rules and scoring modules stays at or above 90%.
+      - name: Coverage threshold
+        run: npm run test:coverage
+
+      # Gate 6 — no database credential in the client bundle.
+      - name: Build
+        run: npm run build
+
+      - name: Bundle credential scan
+        run: npm run check:bundle
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate strategy tables
+        run: npm run generate:ev
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
