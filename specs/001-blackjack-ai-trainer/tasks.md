@@ -48,14 +48,14 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T013 Define shared types in `src/engine/types.ts`: `Rank`, `Suit`, `Card`, `Action`, `Outcome`, `Hand`, `RoundState`, `Decision`, `Rng`, `HouseRules` per [contracts/engine-api.md](./contracts/engine-api.md). `Action` is the single source of the action vocabulary — no other module may redefine it (Principle III)
-- [ ] T014 Define the Phase 1 house rules constant in `src/engine/rules-config.ts`: 6 decks, dealer hits soft 17, 3:2 naturals, double after split, max 4 hands, no surrender, 0.75 penetration (spec Assumption 1)
-- [ ] T015 Write failing determinism test in `tests/unit/engine/rng.test.ts` asserting `createRng(n)` produces identical sequences across repeated calls and across process runs
-- [ ] T016 Implement the seeded PRNG in `src/engine/rng.ts` behind the `Rng` interface (research.md R2). `Math.random` must not appear
-- [ ] T017 [P] Write test helpers in `tests/helpers/scripted-rng.ts` providing an `Rng` that returns a scripted sequence, so tests can force specific hands without seed-hunting
-- [ ] T018 [P] Write test helpers in `tests/helpers/hands.ts` for building `Hand` and `RoundState` fixtures from shorthand like `'A,6'`
-- [ ] T019 [P] Write the reference basic strategy chart fixture in `tests/fixtures/basic-strategy.ts` for the T014 rule set, to be used as the test oracle for FR-021 and SC-003
-- [ ] T020 Verify the ESLint boundary rule actually fails by temporarily adding a `react` import to `src/engine/types.ts`, confirming the error, then removing it
+- [X] T013 Define shared types in `src/engine/types.ts`: `Rank`, `Suit`, `Card`, `Action`, `Outcome`, `Hand`, `RoundState`, `Decision`, `Rng`, `HouseRules` per [contracts/engine-api.md](./contracts/engine-api.md). `Action` is the single source of the action vocabulary — no other module may redefine it (Principle III)
+- [X] T014 Define the Phase 1 house rules constant in `src/engine/rules-config.ts`: 6 decks, dealer hits soft 17, 3:2 naturals, double after split, max 4 hands, no surrender, 0.75 penetration (spec Assumption 1)
+- [X] T015 Write failing determinism test in `tests/unit/engine/rng.test.ts` asserting `createRng(n)` produces identical sequences across repeated calls and across process runs
+- [X] T016 Implement the seeded PRNG in `src/engine/rng.ts` behind the `Rng` interface (research.md R2). `Math.random` must not appear
+- [X] T017 [P] Write test helpers in `tests/helpers/scripted-rng.ts` providing an `Rng` that returns a scripted sequence, so tests can force specific hands without seed-hunting
+- [X] T018 [P] Write test helpers in `tests/helpers/hands.ts` for building `Hand` and `RoundState` fixtures from shorthand like `'A,6'`
+- [X] T019 [P] Write the reference basic strategy chart fixture in `tests/fixtures/basic-strategy.ts` for the T014 rule set, to be used as the test oracle for FR-021 and SC-003
+- [X] T020 Verify the ESLint boundary rule actually fails by temporarily adding a `react` import to `src/engine/types.ts`, confirming the error, then removing it
 
 **Checkpoint**: Foundation ready — user stories can begin.
 
