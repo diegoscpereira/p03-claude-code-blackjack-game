@@ -58,10 +58,41 @@ export interface DataStore {
  * bundle, so the boundary here is structural rather than procedural, and
  * `npm run check:bundle` fails the build if it is ever crossed.
  */
+/**
+ * The role a Supabase JWT carries, or null for a non-JWT key format.
+ *
+ * Read without verification on purpose: this is our own key, and the only use
+ * is a configuration diagnostic. It exists because the failure it catches —
+ * an `anon` key pasted where the service key belongs — surfaces from Postgres
+ * as a bare `permission denied for table user_progress`, which points at the
+ * schema rather than at the credential and costs an hour to chase.
+ */
+function roleOf(key: string): string | null {
+  const payload = key.split('.')[1];
+  if (!payload) return null;
+  try {
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    return typeof decoded?.role === 'string' ? decoded.role : null;
+  } catch {
+    return null;
+  }
+}
+
 export function supabaseStore(): DataStore {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_KEY must be configured');
+
+  const role = roleOf(key);
+  if (role !== null && role !== 'service_role') {
+    // Server-side log only — the role name, never the key. With no RLS
+    // (FR-065), any role other than service_role has no grants at all, so this
+    // is a hard misconfiguration rather than a degraded mode.
+    console.error(
+      `SUPABASE_SERVICE_KEY carries role "${role}", not "service_role" — ` +
+        'every query will fail with "permission denied". Use the service_role key.',
+    );
+  }
 
   const client = createClient(url, key, { auth: { persistSession: false } });
 
