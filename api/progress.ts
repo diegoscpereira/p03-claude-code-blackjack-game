@@ -126,10 +126,11 @@ export function createProgressHandler(store: DataStore): ApiHandler {
       if (req.method === 'GET') return await handleGet(req, res, store);
       if (req.method === 'PUT') return await handlePut(req, res, store);
       fail(res, 405, `${req.method ?? 'unknown'} is not supported`);
-    } catch {
-      // FR-062: the client keeps the record queued and retries with backoff, so
-      // the useful thing to return is a status it can act on — not a detail of
-      // the failure that would only ever reach a log nobody reads.
+    } catch (error) {
+      // The detail goes to the platform log, server-side only; the client gets
+      // a status it can act on and nothing that could leak schema or
+      // credentials. FR-062 keeps the record queued and retried either way.
+      console.error('progress request failed:', error);
       fail(res, 503, 'progress store unavailable');
     }
   };

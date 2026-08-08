@@ -95,8 +95,9 @@ export function createHandsHandler(store: DataStore): ApiHandler {
     try {
       if (req.method === 'POST') return await handlePost(req, res, store);
       fail(res, 405, `${req.method ?? 'unknown'} is not supported`);
-    } catch {
-      // FR-062: retryable, and safe to retry — that is what FR-071 buys.
+    } catch (error) {
+      // Logged server-side; retryable, and safe to retry — that is FR-071.
+      console.error('hand log request failed:', error);
       fail(res, 503, 'hand log store unavailable');
     }
   };
