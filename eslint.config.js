@@ -128,7 +128,14 @@ export default tseslint.config(
 
   // ---- Test and tooling code ----------------------------------------------
   {
-    files: ['tests/**/*.{ts,tsx}', 'scripts/**/*.ts', '*.config.{ts,js}'],
+    files: [
+      'tests/**/*.{ts,tsx}',
+      'scripts/**/*.ts',
+      '*.config.{ts,js}',
+      // Claude Code hooks talk to the harness over stdout, so `console.log` is
+      // their protocol rather than a stray debug statement.
+      '.claude/hooks/**/*.mjs',
+    ],
     rules: {
       // Test bodies and generated-data scripts are naturally long; the size caps
       // exist to keep production modules reviewable, and applying them here

@@ -22,6 +22,10 @@ What I wanted to find out was whether an AI coding agent can be held to an engin
 rather than just asked for snippets — whether you can give it a written constitution, make it
 plan before it builds, and enforce the result with gates it cannot talk its way past.
 
+**Claude Code features used**, all in [`.claude/`](.claude/): custom skills as slash commands
+(`/speckit-*`), a written constitution as durable project rules, a scoped permission allowlist,
+and three hooks — see [Hooks](#hooks) below.
+
 | | |
 |---|---|
 | **Tasks planned and completed** | 133 of 133, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
@@ -63,6 +67,19 @@ The artefacts are all in [`specs/001-blackjack-ai-trainer/`](specs/001-blackjack
 **The constitution is the part that made the difference.** It sets numeric budgets — 100 ms to
 respond to a click, 90% coverage on the rules, 30 seconds for the test suite — and every one
 became a CI gate.
+
+---
+
+## Hooks
+
+Three hooks in [`.claude/settings.json`](.claude/settings.json):
+
+- **`check-branch-sync.mjs`** — blocks a commit or push when the branch is behind its upstream,
+  so a stale checkout can't turn into a rejected push or a needless merge.
+- **`check-no-secrets.mjs`** — scans the outgoing commits for a JWT-shaped string or a stray
+  `.env` file and refuses the push. The bundle scan guards `dist/`; this guards the repository.
+- **`check-sdd-flow.mjs`** — when a brand-new file appears under `src/` or `api/`, injects a
+  reminder that the work should trace to a task in `tasks.md` and to a test written first.
 
 ---
 
