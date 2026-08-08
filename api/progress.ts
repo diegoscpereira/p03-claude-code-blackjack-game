@@ -139,10 +139,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   let store: DataStore;
   try {
     store = supabaseStore();
-  } catch {
-    // Missing configuration is an operator error, but it must still reach the
-    // client as something it can act on. FR-062 keeps the record queued and
-    // retried, so a 503 here means a misconfigured deploy loses no progression.
+  } catch (error) {
+    // Server-side only: the reason goes to the platform log, never to the
+    // client, which gets a status it can act on and nothing more. Swallowing
+    // this silently made a misconfigured deploy undiagnosable from outside.
+    console.error('progress store unavailable:', error);
+    // FR-062 keeps the record queued and retried, so a misconfigured deploy
+    // loses no progression.
     return fail(res, 503, 'progress store is not configured');
   }
   await createProgressHandler(store)(req, res);

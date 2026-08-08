@@ -106,8 +106,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   let store: DataStore;
   try {
     store = supabaseStore();
-  } catch {
-    // Retryable rather than fatal — see the note in progress.ts.
+  } catch (error) {
+    // Retryable rather than fatal, and logged server-side — see progress.ts.
+    console.error('hand log store unavailable:', error);
     return fail(res, 503, 'hand log store is not configured');
   }
   await createHandsHandler(store)(req, res);
