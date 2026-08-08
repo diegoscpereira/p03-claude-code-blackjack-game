@@ -3,80 +3,75 @@
 [![CI](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/ci.yml/badge.svg)](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/ci.yml)
 [![Coverage](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/coverage.yml/badge.svg)](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/coverage.yml)
 
-A browser Blackjack table that tells you the **expected value of every legal action**, explains
-why one of them is best, and seats two contrasting bots beside you — all resolved locally, with
-no network between you and your next card.
+A browser Blackjack trainer that shows the **expected value of every legal action**, explains
+why one is best, and seats two contrasting bots at the table.
 
-![The table, mid-hand: progression, dealer and player hands, two bots, and the expected-value companion](docs/screenshots/table.png)
+**Live:** [p03-claude-code-blackjack-game.vercel.app](https://p03-claude-code-blackjack-game.vercel.app)
 
-**Live demo**: **[p03-claude-code-blackjack-game.vercel.app](https://p03-claude-code-blackjack-game.vercel.app)**
+![The table mid-hand: progression, dealer and player hands, two bots, and the expected-value companion](docs/screenshots/table.png)
 
-## What this is
+---
 
-A play-money trainer, built to be *correct* rather than flashy. Six decks, dealer hits soft 17,
-naturals pay 3:2, double after split, resplit to four hands. The whole game runs in the browser
-against a pure, seeded TypeScript engine; a serverless pair of endpoints persists progression in
-the background and can fail indefinitely without you noticing.
+## What this project is really about
 
-- **The companion** ranks every legal action by expected value, marks the recommendation, and
-  explains it in a sentence — no model call, no spinner, no network.
-- **Two bots** with documented, contrasting playstyles act on their own hands. Their 600 ms turn
-  window is presentation only, and skipping it cannot change an outcome.
-- **A tutorial** for beginners that an experienced player can dismiss in one interaction, with
-  nothing gated behind it.
-- **Progression** — XP, ten levels, unlockable strategy charts, lifetime statistics — that
-  survives a reload, a tab close, and a flight with no wifi.
+This is a **portfolio piece about working with Claude Code**, not a claim to be a TypeScript
+specialist. The whole application was built by driving Claude Code through a spec-driven
+workflow: I set the direction, made the product and architecture calls, reviewed the output,
+and deployed it. Claude wrote the code, the tests, and the documents.
 
-## 30-second start
+What I wanted to find out was whether an AI coding agent can be held to an engineering standard
+rather than just asked for snippets — whether you can give it a written constitution, make it
+plan before it builds, and enforce the result with gates it cannot talk its way past.
 
-```bash
-npm install
-npm run generate:ev    # required — src/strategy/data/ is generated, not committed
-npm run dev            # http://localhost:5173
+The repository is the answer, and it is meant to be read as much as run.
+
+| | |
+|---|---|
+| **Tasks planned and completed** | 133 of 133, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
+| **Tests** | 1,076 unit + integration, 56 end-to-end |
+| **Coverage on the rules engine** | 98.8% (`src/engine`), 99.3% (`src/strategy`) |
+| **CI gates** | 6, all blocking |
+| **Architecture decision records** | 4, each naming the rejected alternative |
+| **Requirements** | 80 functional, 11 non-functional, all traceable to a test |
+
+---
+
+## How it was built
+
+Each step is a Claude Code command that produced a document, reviewed before the next one ran.
+Nothing was written until the step before it was settled.
+
+```
+/speckit-constitution   →  the rules the project cannot break
+/speckit-specify        →  what it must do, in requirements
+/speckit-clarify        →  five ambiguities resolved before planning
+/speckit-plan           →  architecture, stack, and the constitution check
+/speckit-tasks          →  133 tasks, tests ordered before implementations
+/speckit-analyze        →  cross-checked the documents against each other
+/speckit-implement      →  built it, phase by phase
 ```
 
-That is the whole setup. No database is needed: without one, progression stays local and the
-sync indicator shows pending forever, which is itself a working demonstration of FR-062.
+The artefacts are all in [`specs/001-blackjack-ai-trainer/`](specs/001-blackjack-ai-trainer/):
 
-To run the persistence endpoints too, add a Supabase project and use `vercel dev` — see
-[quickstart.md](specs/001-blackjack-ai-trainer/quickstart.md).
+| Document | What it settles |
+|---|---|
+| [constitution.md](.specify/memory/constitution.md) | Four principles: code quality, test-first, UX consistency, performance |
+| [spec.md](specs/001-blackjack-ai-trainer/spec.md) | Requirements and the five recorded clarifications |
+| [research.md](specs/001-blackjack-ai-trainer/research.md) | Eight technical decisions with rejected alternatives |
+| [plan.md](specs/001-blackjack-ai-trainer/plan.md) | Architecture and why Vite rather than Next.js |
+| [data-model.md](specs/001-blackjack-ai-trainer/data-model.md) | The game model, the two tables, and why one value is deliberately not a column |
+| [contracts/](specs/001-blackjack-ai-trainer/contracts/) | The engine API and the HTTP API |
 
-## How the EV engine works
+**The constitution is the part that made the difference.** It sets numeric budgets — 100 ms to
+respond to a click, 90% coverage on the rules, 30 seconds for the test suite — and every one
+became a CI gate rather than an intention. When a module shipped without tests, coverage failed
+the build. When a file grew past 400 lines, lint failed it. The agent could not negotiate with
+either.
 
-The interesting number on screen is the expected value beside each action. It is not estimated,
-and it is not computed while you wait.
+The feature work lands as one commit per user story, so the increments are reviewable in order
+— followed by the fixes that deploying to production turned up.
 
-**Exact EV for one decision point is a recursive evaluation over the remaining shoe**: the
-dealer's outcome distribution given their upcard, then each action's value, with *hitting*
-recursing over every card that could come next. Correct implementations take tens of
-milliseconds to seconds per point — far past the 100 ms budget the interface holds itself to.
-
-So the solver runs **once, at build time**:
-
-```bash
-npm run generate:ev    # scripts/ev-solver.ts → src/strategy/data/ev-tables.json
-```
-
-It solves 380 decision points — 38 player shapes × 10 dealer upcards — into 23.7 KB of JSON.
-At runtime, `src/strategy/ev.ts` does a hash lookup. Microseconds, synchronous, no `await`, and
-identical on every run by construction rather than by promise.
-
-Three details worth knowing, because they are where this kind of solver usually goes wrong:
-
-- **Card removal is exact** along each draw path, with the memo keyed on the remaining
-  composition. A fixed-composition approximation differed only in the fourth decimal, but it
-  made the memo unsound — exactness was the cheaper correctness story.
-- **The dealer is modelled with a peek.** Hole cards that would make a natural are excluded and
-  the rest renormalised, because such a round ends before you decide. This is why the Ace and
-  ten columns do not match *unconditional* published bust rates, and the test asserts that
-  difference deliberately instead of papering over it.
-- **A disagreement with a published chart is a solver bug, never a chart disagreement.** That
-  rule earned its place: the first run disagreed at exactly one cell of 370 — soft 14 against a
-  4 — caused by an Ace drawn onto a soft hand being marked *hard*. Fixing the solver brought
-  agreement to 100%. "Correcting" the fixture would have shipped the bug.
-
-The same tables feed the unlockable strategy charts, so a guide and a live recommendation
-cannot disagree — there is one source of numbers, not two that are checked against each other.
+---
 
 ## Architecture
 
@@ -91,67 +86,93 @@ graph LR
     API --> DB[("Supabase<br/>PostgreSQL")]
 ```
 
-**The dotted edge is the only network hop, and the only edge allowed to fail.** Everything solid
-is synchronous and local. Imports point one way only, and that is enforced by an ESLint
-boundary rule *and* by [a test](tests/unit/architecture.test.ts) that a
-`// eslint-disable` cannot silence.
+**The dotted edge is the only network hop, and the only one allowed to fail.** Everything solid
+is synchronous and local, so the game is fully playable offline after first load.
 
-Full walkthrough in [docs/architecture.md](docs/architecture.md).
+Progression is written to Supabase Postgres through the app's own serverless endpoints, never
+from the browser — the database credential stays server-side, and a build gate scans the client
+bundle to prove it. Writes go through a queue that survives a tab close and retries safely,
+because every write is idempotent.
 
-## Testing
+Imports point one way only, enforced by a lint rule *and* by
+[a test](tests/unit/architecture.test.ts) that a `// eslint-disable` cannot silence. Full
+walkthrough in [docs/architecture.md](docs/architecture.md).
+
+---
+
+## The part I'd point a reviewer at
+
+The expected values are not estimates. Computing one exactly means recursing over every card
+that could still come out of the shoe — far too slow to do while someone waits for a card.
+
+So it runs **once, at build time**: a solver evaluates all 380 decision points into a 23.7 KB
+table, and at runtime the app does a lookup. Microseconds instead of seconds, and identical on
+every run.
+
+The reason this is worth showing is what happened when it was checked against a published
+strategy chart. The first run disagreed at exactly one cell out of 370 — soft 14 against a
+dealer 4. The cause was a real bug: an Ace drawn onto an already-soft hand was being marked as
+hard, which quietly shifted where soft doubling starts.
+
+The rule written down in advance was *"a disagreement is a solver bug, never a chart
+disagreement"* — so the solver got fixed and agreement went to 100%. Adjusting the expected
+value to match would have hidden the defect and passed the test. Deciding that before seeing
+the failure is what made it catch anything.
+
+Details in [ADR 0001](docs/adr/0001-precomputed-ev-tables.md).
+
+---
+
+## What it does
+
+- **Companion** — every legal action ranked by expected value, with the recommendation marked
+  and explained in a sentence.
+- **Two bots** — contrasting playstyles, acting on their own hands, skippable at any time.
+- **Tutorial** — eight guided lessons for beginners, dismissable in one click, with nothing
+  locked behind it.
+- **Progression** — XP, ten levels, unlockable strategy charts, and lifetime statistics that
+  survive a reload or a flight with no wifi.
+
+Six decks, dealer hits soft 17, blackjack pays 3:2, double after split, resplit to four hands.
+Play money only.
+
+---
+
+## Run it locally
 
 ```bash
-npm run typecheck      # 1. strict TS
-npm run lint           # 2. eslint, including the engine import-boundary rule
-npm run test           # 3. 1,051 unit + integration tests, ~3.4s
-npm run test:coverage  # 4. ≥ 90% on src/engine and src/strategy
-npm run check:bundle   # 5. no credential in the client bundle
-npm run test:e2e       # 6. Playwright — separate job, exempt from the 30s budget
+npm install
+npm run generate:ev    # the strategy tables are generated, not committed
+npm run dev            # http://localhost:5173
 ```
 
-Coverage on the modules that decide outcomes: **98.8% on `src/engine`, 99.3% on
-`src/strategy`**. Presentation code has no minimum, deliberately.
-
-Every recorded hand replays from its seed alone
-([`src/engine/replay.ts`](src/engine/replay.ts)) — the shuffle consumes the round's only
-randomness, so the seed fixes the shoe and the action list fixes everything drawn from it.
-
-## Deploying
+No database needed — progression stays local and the sync indicator simply shows as pending,
+which is the offline behaviour working as designed. Full setup, deployment, and the validation
+checklist are in [quickstart.md](specs/001-blackjack-ai-trainer/quickstart.md).
 
 ```bash
-vercel --prod
+npm run test           # 1,076 tests, ~5s
+npm run test:e2e       # 56 browser tests
 ```
 
-Set `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` as **server-side** environment variables. If
-either ever appears with a `VITE_` prefix, `npm run check:bundle` fails the build — Vite only
-inlines that prefix, so the credential boundary is structural rather than procedural.
+---
 
-Apply the schema with `psql "$SUPABASE_DB_URL" -f supabase/schema.sql`.
+## Honest notes
 
-## Built with spec-driven development
+**On the "AI" in the name.** Two different things, worth separating. The app was *built* with
+AI. The intelligence *inside* it is decision-theoretic — an expected-value solver, strategy
+tables, and rule-based bots. Nothing calls a language model at runtime; the explanations are
+authored content resolved locally, a decision recorded in
+[ADR 0003](docs/adr/0003-template-explanations.md) along with why generating them live would
+have been the wrong trade.
 
-This repository is as much an artefact of *how* it was built as of what it does. The full trail
-lives in [`specs/001-blackjack-ai-trainer/`](specs/001-blackjack-ai-trainer/):
+**One performance budget is missed.** Background writes were budgeted at 300 ms and measure
+594 ms at the 95th percentile against the live deployment. The cause is identified and written
+down in [docs/architecture.md](docs/architecture.md) rather than quietly dropped. It does not
+affect gameplay, because nothing you click ever waits on the network.
 
-| Artefact | What it settles |
-|---|---|
-| [constitution.md](.specify/memory/constitution.md) | The four principles every gate enforces |
-| [spec.md](specs/001-blackjack-ai-trainer/spec.md) | 80 functional and 11 non-functional requirements, and five recorded clarifications |
-| [research.md](specs/001-blackjack-ai-trainer/research.md) | Eight technical decisions, each with its rejected alternatives |
-| [plan.md](specs/001-blackjack-ai-trainer/plan.md) | Architecture, the constitution check, and why Vite over Next.js |
-| [data-model.md](specs/001-blackjack-ai-trainer/data-model.md) | The engine model, the two tables, and why EV accuracy is not a column |
-| [contracts/](specs/001-blackjack-ai-trainer/contracts/) | The engine API and the HTTP API, including the merge semantics |
-| [tasks.md](specs/001-blackjack-ai-trainer/tasks.md) | 130 tasks, tests before implementations throughout |
-
-Four decisions a reviewer would otherwise have to ask about are recorded in
-[`docs/adr/`](docs/adr/): [precomputed EV tables](docs/adr/0001-precomputed-ev-tables.md),
-[no RLS with a server-side proxy](docs/adr/0002-no-rls-server-side-proxy.md),
-[authored explanations over a runtime model](docs/adr/0003-template-explanations.md), and
-[device-scoped identity](docs/adr/0004-device-scoped-identity.md).
-
-**One honest note on the "AI" in the title.** The intelligence here is decision-theoretic — an
-exact expected-value solver, strategy tables, and rule-based bot agents. Nothing in this
-release calls a language model at runtime; explanations are authored content resolved from a
-local library, a decision recorded in ADR 0003. The `api/` directory is shaped so a model route
-could be added later without touching the game path, but no such route exists today, and it
-seemed better to say so plainly than to let "AI" do ambiguous work.
+**Deploying found four defects that 1,000 passing tests did not** — module resolution,
+dependency placement, a runtime pin, and database grants. All four were invisible locally and
+obvious in production. Two were only diagnosable after adding server-side logging, because the
+original error handling returned a plausible status and discarded the reason. That was a
+design gap, and the fix is in the history.
