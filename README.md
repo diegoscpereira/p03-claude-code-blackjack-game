@@ -124,20 +124,43 @@ Play money only.
 
 ## Run it locally
 
+Requires Node 20+. No database needed — progression stays local and the sync indicator shows
+as pending, which is the offline behaviour working as designed.
+
+**1. Clone**
+
+```bash
+git clone https://github.com/diegoscpereira/p03-claude-code-blackjack-game.git
+cd p03-claude-code-blackjack-game
+```
+
+**2. Install**
+
 ```bash
 npm install
-npm run generate:ev    # the strategy tables are generated, not committed
-npm run dev            # http://localhost:5173
 ```
 
-No database needed — progression stays local and the sync indicator simply shows as pending,
-which is the offline behaviour working as designed. Full setup, deployment, and the validation
-checklist are in [quickstart.md](specs/001-blackjack-ai-trainer/quickstart.md).
+**3. Generate the strategy tables** — computed at build time, not committed.
 
 ```bash
-npm run test           # 1,076 tests, ~5s
-npm run test:e2e       # 56 browser tests
+npm run generate:ev
 ```
+
+**4. Start** — opens on http://localhost:5173
+
+```bash
+npm run dev
+```
+
+**5. Optional — run the suite**
+
+```bash
+npm run test       # 1,076 tests, ~5s
+npm run test:e2e   # 56 browser tests
+```
+
+Deployment and the full validation checklist are in
+[quickstart.md](specs/001-blackjack-ai-trainer/quickstart.md).
 
 ---
 
