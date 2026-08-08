@@ -288,7 +288,7 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 - [X] T126 [P] Verify bounded memory across a 500-hand session, asserting no unbounded growth in round state or logs (Principle IV)
 - [X] T127 [P] Add the two-tab concurrency test in `tests/integration/two-tabs.test.ts`: shared identity, later write wins for counters, both tabs' hand logs retained (spec Edge Cases)
 - [X] T128 Verify `npm run check:bundle` fails when a credential is deliberately introduced, then confirm it passes on a clean build (constitution Data Safety gate)
-- [ ] T129 [P] Run the full quickstart validation suite V1–V9 from `quickstart.md` on a clean clone
+- [X] T129 [P] Run the full quickstart validation suite V1–V9 from `quickstart.md` on a clean clone
 - [ ] T130 Deploy to Vercel with server-side environment variables and confirm the live deployment passes V5 (offline) and V9 (bundle scan)
 
 ---
