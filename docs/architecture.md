@@ -180,9 +180,43 @@ playable table.
 ## Performance budgets — measured
 
 > Constitution Principle IV: *"Performance budgets MUST be verified by measurement, not
-> asserted."* This section is filled in by task T125 and is the record of that measurement.
+> asserted."*
 
-_Pending T125._
+Measured by [`tests/e2e/performance.spec.ts`](../tests/e2e/performance.spec.ts), which prints
+these numbers and **fails if a budget is exceeded** — so they are a gate, not a snapshot that
+rots. Timings are taken inside the page with `performance.now()` and a `requestAnimationFrame`
+check, so they measure to *painted*, not merely to dispatched.
+
+| Budget | Requirement | Measured (p95) | Median | n |
+|---|---|---|---|---|
+| Input → rendered card | NFR-001, < 100 ms | **14.4 ms** | 11.4 ms | 51 |
+| Settle + progression + enqueue, synchronous | NFR-001 | **0.8 ms** | 0.3 ms | 15 |
+| First load → interactive table | NFR-004, < 2 s | **46 ms** ¹ | 18.5 ms | 5 |
+| Settlement → visible in post-game analysis | SC-005, < 5 s at 95% | **12.2 ms** | 10.9 ms | 10 |
+| Unit + integration suite wall time | Principle IV, < 30 s | **3.4 s** | — | 1,051 tests |
+| Background write round trip | NFR-003, < 300 ms p95 | *not measurable locally* ² | — | — |
+
+¹ Against a local preview server, so this excludes network transfer. The client bundle is
+**221.9 KB of JavaScript (70.8 KB gzipped)** and 14.2 KB of CSS (3.6 KB gzipped), which
+includes the 23.7 KB EV table inlined at build time. On a 10 Mbps connection that transfer is
+roughly 70 ms, leaving the 2-second budget with well over an order of magnitude of headroom.
+The honest claim is that the *application* costs ~46 ms; the network cost depends on the
+connection and is bounded by the bundle size above.
+
+² NFR-003 is a property of a deployed edge region, not of a preview server, and measuring it
+here would produce a number that means nothing. It is outstanding until T130 deploys. What
+*is* measured is the part this repository controls — the client-side cost of the write path,
+which is the 0.8 ms row above, because `enqueue` is synchronous and nothing on the settlement
+path awaits the network.
+
+**Why the input path has this much headroom** is worth stating, because it is design rather
+than tuning. There is no computation on it: expected values are a hash lookup into a
+build-time table (ADR 0001), the engine reducer is a pure function over the state, and the
+explanation is a keyed lookup (ADR 0003). The 14 ms measured is React reconciliation and paint,
+not the game.
+
+The two deliberate delays — the deal animation and the 600 ms bot turn window — are excluded by
+Principle IV and are cancelled by any input, so they never appear in these samples.
 
 ---
 

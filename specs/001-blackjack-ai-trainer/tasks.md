@@ -281,13 +281,13 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
-- [ ] T122 [P] Keyboard-only end-to-end test through a complete hand in `tests/e2e/keyboard.spec.ts` (NFR-008)
-- [ ] T123 [P] Contrast audit against WCAG 2.1 AA across all surfaces, recorded in `tests/e2e/contrast.spec.ts` (NFR-008)
-- [ ] T124 [P] Responsive verification from 360px to 1920px with no horizontal scrolling, in `tests/e2e/responsive.spec.ts` (NFR-010)
-- [ ] T125 Measure and record against budget: p95 input→render (NFR-001, 100ms), first-load-to-interactive (NFR-004, 2s), background write round trip (NFR-003, 300ms p95 from an edge region), and time from hand settlement to visibility in post-game analysis (SC-005, 5s at 95%). Record actual numbers in `docs/architecture.md` — Principle IV requires measurement, not assertion
-- [ ] T126 [P] Verify bounded memory across a 500-hand session, asserting no unbounded growth in round state or logs (Principle IV)
-- [ ] T127 [P] Add the two-tab concurrency test in `tests/integration/two-tabs.test.ts`: shared identity, later write wins for counters, both tabs' hand logs retained (spec Edge Cases)
-- [ ] T128 Verify `npm run check:bundle` fails when a credential is deliberately introduced, then confirm it passes on a clean build (constitution Data Safety gate)
+- [X] T122 [P] Keyboard-only end-to-end test through a complete hand in `tests/e2e/keyboard.spec.ts` (NFR-008)
+- [X] T123 [P] Contrast audit against WCAG 2.1 AA across all surfaces, recorded in `tests/e2e/contrast.spec.ts` (NFR-008)
+- [X] T124 [P] Responsive verification from 360px to 1920px with no horizontal scrolling, in `tests/e2e/responsive.spec.ts` (NFR-010)
+- [X] T125 Measure and record against budget: p95 input→render (NFR-001, 100ms), first-load-to-interactive (NFR-004, 2s), background write round trip (NFR-003, 300ms p95 from an edge region), and time from hand settlement to visibility in post-game analysis (SC-005, 5s at 95%). Record actual numbers in `docs/architecture.md` — Principle IV requires measurement, not assertion
+- [X] T126 [P] Verify bounded memory across a 500-hand session, asserting no unbounded growth in round state or logs (Principle IV)
+- [X] T127 [P] Add the two-tab concurrency test in `tests/integration/two-tabs.test.ts`: shared identity, later write wins for counters, both tabs' hand logs retained (spec Edge Cases)
+- [X] T128 Verify `npm run check:bundle` fails when a credential is deliberately introduced, then confirm it passes on a clean build (constitution Data Safety gate)
 - [ ] T129 [P] Run the full quickstart validation suite V1–V9 from `quickstart.md` on a clean clone
 - [ ] T130 Deploy to Vercel with server-side environment variables and confirm the live deployment passes V5 (offline) and V9 (bundle scan)
 
