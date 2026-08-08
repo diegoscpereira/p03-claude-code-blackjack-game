@@ -150,3 +150,31 @@ have been the wrong trade.
 594 ms at the 95th percentile against the live deployment. The cause is identified and written
 down in [docs/architecture.md](docs/architecture.md) rather than quietly dropped. It does not
 affect gameplay, because nothing you click ever waits on the network.
+
+---
+
+## Next steps
+
+**1. An MCP server over the engine.** Expose the engine as tools an agent can call — replay a
+hand from its seed, query the solver, pull a player's deviation pattern from the hand logs. It
+closes the AI-built-but-not-AI-embedded gap noted above, and the hard parts already exist:
+`replayRound`, the EV tables, and the decision records are built and tested.
+
+**2. A post-session coach.** The player-facing half of the same idea: *"you deviated on six of
+nine soft hands, all in the same direction."* Same hand logs, same primitives — off the
+interactive path, so the offline guarantee holds.
+
+**3. Close the 300 ms write budget.** The one measured failure. Both fixes are identified in
+[docs/architecture.md](docs/architecture.md): an atomic `GREATEST` upsert to remove one of the
+two round trips per write, and a serverless region pinned to the database's.
+
+Each is a second feature run through the same `/speckit-*` cycle — which is the open question
+this project hasn't answered: whether the constitution holds when the requirements weren't
+written at the same time as the rules.
+
+**Also outstanding**, all recorded in an ADR or the clarification summary: the monotonic merge
+rule is implemented twice ([ADR 0002](docs/adr/0002-no-rls-server-side-proxy.md)); the endpoints
+have no rate limiting; there is no retention policy for orphaned rows
+([ADR 0004](docs/adr/0004-device-scoped-identity.md)); progression has no recovery code;
+post-game analysis reads only the last 50 hands from memory; and insurance, surrender, and side
+bets are modelled in the engine but not exposed.
