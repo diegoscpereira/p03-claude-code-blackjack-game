@@ -17,6 +17,8 @@ import {
 import { handTotal } from '../engine/hand';
 import { evDifference, rankActions, recommend } from '../strategy/ev';
 import { upcardKey } from '../strategy/shape';
+import { applySettlement, initialProgression, progressionActions } from './progression';
+import type { ProgressionState } from './progression';
 import type { Action, Card, Decision, Rank, RoundState, SettledRound } from '../engine/types';
 import type { RankedAction } from '../strategy/ev';
 
@@ -34,7 +36,7 @@ import type { RankedAction } from '../strategy/ev';
 
 const rules = PHASE_1_RULES;
 
-export interface GameState {
+export interface GameState extends ProgressionState {
   bankroll: number;
   bet: number;
   bankrollResets: number;
@@ -86,6 +88,7 @@ type Set = (partial: Partial<GameState>) => void;
 type Get = () => GameState;
 
 const initialState = () => ({
+  ...initialProgression(),
   bankroll: STARTING_BANKROLL,
   bet: DEFAULT_BET,
   bankrollResets: 0,
@@ -120,18 +123,32 @@ function botSeatsFor(bet: number): BotSeatConfig[] {
  */
 const freshSeed = (): number => nextSeed();
 
+/**
+ * Runs the dealer, settles, and applies everything the settlement implies.
+ *
+ * Every step is synchronous. The bankroll moves, then progression is applied
+ * optimistically, then the records are queued — and only after all of that does
+ * anything touch the network, on a timer, in another module (FR-060, FR-061).
+ */
+function finishRound(set: Set, get: Get, state: RoundState): void {
+  const played = playDealer(state, rules);
+  const settled = settle(played, rules);
+
+  set({
+    round: played,
+    lastSettled: settled,
+    bankroll: get().bankroll + settled.totalNetChange,
+    carriedShoe: played.shoe,
+    carriedShoeSize: played.shoeSize,
+  });
+
+  // T106 — FR-052: XP, counters, and the outbox enqueue, applied after the
+  // bankroll so the snapshot queued is the settled one.
+  applySettlement(set, get, settled);
+}
+
 function roundActions(set: Set, get: Get) {
-  const finish = (state: RoundState): void => {
-    const played = playDealer(state, rules);
-    const settled = settle(played, rules);
-    set({
-      round: played,
-      lastSettled: settled,
-      bankroll: get().bankroll + settled.totalNetChange,
-      carriedShoe: played.shoe,
-      carriedShoeSize: played.shoeSize,
-    });
-  };
+  const finish = (state: RoundState): void => finishRound(set, get, state);
 
   return {
     deal: (seed?: number): void => {
@@ -370,4 +387,5 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...selectors(get),
   ...bankrollActions(set, get),
   ...tutorialActions(set, get),
+  ...progressionActions(set, get),
 }));

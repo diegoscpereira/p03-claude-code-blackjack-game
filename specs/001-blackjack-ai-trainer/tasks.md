@@ -219,36 +219,36 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 6 (REQUIRED - write first) ⚠️
 
-- [ ] T089 [P] [US6] Unit test XP awards in `tests/unit/progression/xp.test.ts`: 10 per hand plus 2 per matched decision, awarded regardless of win or loss (FR-050)
-- [ ] T090 [P] [US6] Unit test the level ladder in `tests/unit/progression/levels.test.ts`: each threshold, multi-level crossing from a single award, and the level-10 ceiling (FR-051, FR-051d, FR-051e)
-- [ ] T091 [P] [US6] Unit test EV accuracy derivation from the two counters, including the unavailable state at zero decisions, in `tests/unit/progression/accuracy.test.ts` (FR-024a, FR-024b)
-- [ ] T092 [P] [US6] Unit test outbox enqueue, localStorage durability across a simulated reload, backoff, and the 500-record cap in `tests/unit/sync/outbox.test.ts` (FR-062, research.md R5)
-- [ ] T092a [P] [US6] Unit test local-state resilience in `tests/unit/sync/corruption.test.ts`: malformed JSON, a truncated write, and an unknown schema version in `bj.outbox`, `bj.tutorial`, and `bj.player_id` are each discarded and replaced with defaults rather than throwing, and the app still reaches a playable table (constitution Additional Constraints)
-- [ ] T093 [P] [US6] Integration test asserting a retried write produces exactly one hand log and no double-counted counter, in `tests/integration/outbox-idempotency.test.ts` (FR-071)
-- [ ] T094 [P] [US6] Integration test reconciliation in `tests/integration/reconciliation.test.ts`: counters take the higher value, unlocks union, bankroll takes local (spec boundary rule 4)
-- [ ] T095 [P] [US6] Contract test for `GET`/`PUT /api/progress` in `tests/integration/api-progress.test.ts`, including 404-is-not-an-error for a new player (contracts/http-api.md, FR-066)
-- [ ] T096 [P] [US6] Contract test for `POST /api/hands` in `tests/integration/api-hands.test.ts`, including batch rejection with no partial writes (FR-070)
-- [ ] T096a [P] [US6] Contract test for endpoint scoping in `tests/integration/api-scoping.test.ts`: a request omitting `player_id` returns 400; a request cannot address another player's row via any other parameter; responses never contain a `player_id` other than the one requested (FR-069). Also assert handlers hold no module-scope mutable state — two sequential requests with different `player_id` values return correctly scoped results with no bleed-through (NFR-005)
-- [ ] T097 [US6] End-to-end offline test in `tests/e2e/offline.spec.ts`: hand completes offline with no error, indicator appears, results sync on reconnect (SC-006)
+- [X] T089 [P] [US6] Unit test XP awards in `tests/unit/progression/xp.test.ts`: 10 per hand plus 2 per matched decision, awarded regardless of win or loss (FR-050)
+- [X] T090 [P] [US6] Unit test the level ladder in `tests/unit/progression/levels.test.ts`: each threshold, multi-level crossing from a single award, and the level-10 ceiling (FR-051, FR-051d, FR-051e)
+- [X] T091 [P] [US6] Unit test EV accuracy derivation from the two counters, including the unavailable state at zero decisions, in `tests/unit/progression/accuracy.test.ts` (FR-024a, FR-024b)
+- [X] T092 [P] [US6] Unit test outbox enqueue, localStorage durability across a simulated reload, backoff, and the 500-record cap in `tests/unit/sync/outbox.test.ts` (FR-062, research.md R5)
+- [X] T092a [P] [US6] Unit test local-state resilience in `tests/unit/sync/corruption.test.ts`: malformed JSON, a truncated write, and an unknown schema version in `bj.outbox`, `bj.tutorial`, and `bj.player_id` are each discarded and replaced with defaults rather than throwing, and the app still reaches a playable table (constitution Additional Constraints)
+- [X] T093 [P] [US6] Integration test asserting a retried write produces exactly one hand log and no double-counted counter, in `tests/integration/outbox-idempotency.test.ts` (FR-071)
+- [X] T094 [P] [US6] Integration test reconciliation in `tests/integration/reconciliation.test.ts`: counters take the higher value, unlocks union, bankroll takes local (spec boundary rule 4)
+- [X] T095 [P] [US6] Contract test for `GET`/`PUT /api/progress` in `tests/integration/api-progress.test.ts`, including 404-is-not-an-error for a new player (contracts/http-api.md, FR-066)
+- [X] T096 [P] [US6] Contract test for `POST /api/hands` in `tests/integration/api-hands.test.ts`, including batch rejection with no partial writes (FR-070)
+- [X] T096a [P] [US6] Contract test for endpoint scoping in `tests/integration/api-scoping.test.ts`: a request omitting `player_id` returns 400; a request cannot address another player's row via any other parameter; responses never contain a `player_id` other than the one requested (FR-069). Also assert handlers hold no module-scope mutable state — two sequential requests with different `player_id` values return correctly scoped results with no bleed-through (NFR-005)
+- [X] T097 [US6] End-to-end offline test in `tests/e2e/offline.spec.ts`: hand completes offline with no error, indicator appears, results sync on reconnect (SC-006)
 
 ### Implementation for User Story 6
 
-- [ ] T098 [P] [US6] Implement XP award rules in `src/progression/xp.ts` (FR-050)
-- [ ] T099 [P] [US6] Implement the 10-level ladder and unlock mapping in `src/progression/levels.ts` (FR-051d)
-- [ ] T100 [P] [US6] Implement player identity creation and retrieval in `src/sync/identity.ts` using the `bj.player_id` key (FR-053, FR-066)
-- [ ] T101 [US6] Implement the durable outbox in `src/sync/outbox.ts`: synchronous enqueue, background drain, exponential backoff with jitter, 500-record cap (FR-061, FR-062, research.md R5)
-- [ ] T102 [US6] Implement the fetch wrapper in `src/sync/client.ts` targeting `/api` endpoints only (FR-068)
-- [ ] T103 [P] [US6] Write `supabase/schema.sql` creating `user_progress` and `hand_logs` with the columns, checks, and index in data-model.md, and no RLS policies (FR-065)
-- [ ] T103a [P] [US6] Schema assertion test in `tests/integration/schema-shape.test.ts` enumerating the exact allowed columns of `user_progress` and `hand_logs`, failing if any column outside that list exists — so a later migration cannot quietly introduce personal data (FR-054)
-- [ ] T104 [US6] Implement `api/progress.ts` with `GREATEST` merge semantics for counters, array union for unlocks, and incoming values for level and bankroll (contracts/http-api.md, research.md R4). Reject with 400 when `player_id` is absent, and scope every query by it (FR-069)
-- [ ] T105 [US6] Implement `api/hands.ts` with `INSERT … ON CONFLICT (hand_id) DO NOTHING` and a 50-record batch limit (FR-071). Scope every insert by `player_id` and reject batches without it (FR-069)
-- [ ] T106 [US6] Apply progression optimistically in `src/store/gameStore.ts` on settlement: XP, `hands_played`, `wins`, `losses`, `pushes`, `net_bankroll_change`, `decisions_taken`, and `decisions_matched`, enqueueing to the outbox without awaiting (FR-052, FR-060, FR-061)
-- [ ] T107 [US6] Implement session-start restore in `src/store/gameStore.ts`, flushing queued records before restoring, and beginning play before any persistence call completes (FR-064, FR-066)
-- [ ] T108 [P] [US6] Build the passive `SyncIndicator` component in `src/ui/common/SyncIndicator.tsx` — never a modal, never a blocked control (FR-063, Principle III)
-- [ ] T109 [P] [US6] Build the level-up announcement in `src/ui/common/LevelUp.tsx`, granting unlocks without a reload (FR-051)
-- [ ] T110 [P] [US6] Build locked and unlocked guide views in `src/ui/guides/`, rendering charts from the same strategy source the companion uses (FR-051a, FR-051b, FR-051c)
-- [ ] T111 [P] [US6] Build the post-game analysis view in `src/ui/guides/PostGameAnalysis.tsx` reading hand logs (FR-067)
-- [ ] T112 [P] [US6] Write ADR in `docs/adr/0002-no-rls-server-side-proxy.md` recording the access-path decision and its accepted exposure bound
+- [X] T098 [P] [US6] Implement XP award rules in `src/progression/xp.ts` (FR-050)
+- [X] T099 [P] [US6] Implement the 10-level ladder and unlock mapping in `src/progression/levels.ts` (FR-051d)
+- [X] T100 [P] [US6] Implement player identity creation and retrieval in `src/sync/identity.ts` using the `bj.player_id` key (FR-053, FR-066)
+- [X] T101 [US6] Implement the durable outbox in `src/sync/outbox.ts`: synchronous enqueue, background drain, exponential backoff with jitter, 500-record cap (FR-061, FR-062, research.md R5)
+- [X] T102 [US6] Implement the fetch wrapper in `src/sync/client.ts` targeting `/api` endpoints only (FR-068)
+- [X] T103 [P] [US6] Write `supabase/schema.sql` creating `user_progress` and `hand_logs` with the columns, checks, and index in data-model.md, and no RLS policies (FR-065)
+- [X] T103a [P] [US6] Schema assertion test in `tests/integration/schema-shape.test.ts` enumerating the exact allowed columns of `user_progress` and `hand_logs`, failing if any column outside that list exists — so a later migration cannot quietly introduce personal data (FR-054)
+- [X] T104 [US6] Implement `api/progress.ts` with `GREATEST` merge semantics for counters, array union for unlocks, and incoming values for level and bankroll (contracts/http-api.md, research.md R4). Reject with 400 when `player_id` is absent, and scope every query by it (FR-069)
+- [X] T105 [US6] Implement `api/hands.ts` with `INSERT … ON CONFLICT (hand_id) DO NOTHING` and a 50-record batch limit (FR-071). Scope every insert by `player_id` and reject batches without it (FR-069)
+- [X] T106 [US6] Apply progression optimistically in `src/store/gameStore.ts` on settlement: XP, `hands_played`, `wins`, `losses`, `pushes`, `net_bankroll_change`, `decisions_taken`, and `decisions_matched`, enqueueing to the outbox without awaiting (FR-052, FR-060, FR-061)
+- [X] T107 [US6] Implement session-start restore in `src/store/gameStore.ts`, flushing queued records before restoring, and beginning play before any persistence call completes (FR-064, FR-066)
+- [X] T108 [P] [US6] Build the passive `SyncIndicator` component in `src/ui/common/SyncIndicator.tsx` — never a modal, never a blocked control (FR-063, Principle III)
+- [X] T109 [P] [US6] Build the level-up announcement in `src/ui/common/LevelUp.tsx`, granting unlocks without a reload (FR-051)
+- [X] T110 [P] [US6] Build locked and unlocked guide views in `src/ui/guides/`, rendering charts from the same strategy source the companion uses (FR-051a, FR-051b, FR-051c)
+- [X] T111 [P] [US6] Build the post-game analysis view in `src/ui/guides/PostGameAnalysis.tsx` reading hand logs (FR-067)
+- [X] T112 [P] [US6] Write ADR in `docs/adr/0002-no-rls-server-side-proxy.md` recording the access-path decision and its accepted exposure bound
 
 **Checkpoint**: All seven functional stories complete; progression survives sessions.
 
