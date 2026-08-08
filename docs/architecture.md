@@ -194,7 +194,7 @@ check, so they measure to *painted*, not merely to dispatched.
 | First load → interactive table | NFR-004, < 2 s | **46 ms** ¹ | 18.5 ms | 5 |
 | Settlement → visible in post-game analysis | SC-005, < 5 s at 95% | **12.2 ms** | 10.9 ms | 10 |
 | Unit + integration suite wall time | Principle IV, < 30 s | **3.4 s** | — | 1,051 tests |
-| Background write round trip | NFR-003, < 300 ms p95 | *not measurable locally* ² | — | — |
+| Background write round trip | NFR-003, < 300 ms p95 | **594 ms — MISSED** ² | 227 ms | 15 |
 
 ¹ Against a local preview server, so this excludes network transfer. The client bundle is
 **221.9 KB of JavaScript (70.8 KB gzipped)** and 14.2 KB of CSS (3.6 KB gzipped), which
@@ -203,11 +203,29 @@ roughly 70 ms, leaving the 2-second budget with well over an order of magnitude 
 The honest claim is that the *application* costs ~46 ms; the network cost depends on the
 connection and is bounded by the bundle size above.
 
-² NFR-003 is a property of a deployed edge region, not of a preview server, and measuring it
-here would produce a number that means nothing. It is outstanding until T130 deploys. What
-*is* measured is the part this repository controls — the client-side cost of the write path,
-which is the 0.8 ms row above, because `enqueue` is synchronous and nothing on the settlement
-path awaits the network.
+² **Measured against the live deployment, and the one budget this project does not meet.**
+
+Timing it from a laptop would fold in a client-to-edge leg the requirement does not cover, so
+the figure above is a *difference*: the same endpoint was called on a path that runs a query
+(`PUT`) and one rejected before any query (`GET` with no `player_id`, a 400), 15 times each,
+after warming the function. The gap isolates the database round trip. Median 227 ms is inside
+budget; p95 594 ms is roughly double it.
+
+Two causes, both known and both fixable:
+
+- **Each `PUT` costs two sequential round trips**, not one — `api/progress.ts` reads the row,
+  merges in TypeScript, then writes it back (ADR 0002). Moving the monotonic merge into SQL as
+  an atomic `GREATEST` upsert would halve the wall time and close most of the gap.
+- **The function region and the Supabase region are not collocated.** The functions answer from
+  `cdg1`; pinning `regions` in `vercel.json` to the database's region removes an intercontinental
+  hop from every query.
+
+**It is not a gameplay defect, and it is worth being precise about why.** No interactive path
+awaits this call: `enqueue` is synchronous, the drain is a background timer, and a write that
+takes two seconds — or never succeeds — is invisible except as the passive sync indicator
+(FR-062, FR-063). research.md R3 anticipated exactly this and accepted it for cold starts. The
+budget still says 300 ms, though, and it is missed, so it is recorded as missed rather than
+reasoned away.
 
 **Why the input path has this much headroom** is worth stating, because it is design rather
 than tuning. There is no computation on it: expected values are a hash lookup into a
