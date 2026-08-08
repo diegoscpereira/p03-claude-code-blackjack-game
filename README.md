@@ -91,18 +91,6 @@ walkthrough in [docs/architecture.md](docs/architecture.md).
 
 ---
 
-## EV logic
-
-The expected values are not estimates. Computing one exactly means recursing over every card
-that could still come out of the shoe — far too slow to do while someone waits for a card.
-
-So it runs **once, at build time**: a solver evaluates all 380 decision points into a 23.7 KB
-table, and at runtime the app does a lookup.
-
-Details in [ADR 0001](docs/adr/0001-precomputed-ev-tables.md).
-
----
-
 ## What it does
 
 - **Companion** — every legal action ranked by expected value, with the recommendation marked
@@ -139,7 +127,7 @@ npm run test:e2e       # 56 browser tests
 
 ## Additional notes
 
-**On the "AI" term:** Two different things, worth separating. The app was *built* with
+**On the "AI" term:**nThe app was *built* with
 AI. The intelligence *inside* it is decision-theoretic — an expected-value solver, strategy
 tables, and rule-based bots. Nothing calls a language model at runtime; the explanations are
 authored content resolved locally, a decision recorded in
@@ -163,18 +151,3 @@ closes the AI-built-but-not-AI-embedded gap noted above, and the hard parts alre
 **2. A post-session coach.** The player-facing half of the same idea: *"you deviated on six of
 nine soft hands, all in the same direction."* Same hand logs, same primitives — off the
 interactive path, so the offline guarantee holds.
-
-**3. Close the 300 ms write budget.** The one measured failure. Both fixes are identified in
-[docs/architecture.md](docs/architecture.md): an atomic `GREATEST` upsert to remove one of the
-two round trips per write, and a serverless region pinned to the database's.
-
-Each is a second feature run through the same `/speckit-*` cycle — which is the open question
-this project hasn't answered: whether the constitution holds when the requirements weren't
-written at the same time as the rules.
-
-**Also outstanding**, all recorded in an ADR or the clarification summary: the monotonic merge
-rule is implemented twice ([ADR 0002](docs/adr/0002-no-rls-server-side-proxy.md)); the endpoints
-have no rate limiting; there is no retention policy for orphaned rows
-([ADR 0004](docs/adr/0004-device-scoped-identity.md)); progression has no recovery code;
-post-game analysis reads only the last 50 hands from memory; and insurance, surrender, and side
-bets are modelled in the engine but not exposed.
