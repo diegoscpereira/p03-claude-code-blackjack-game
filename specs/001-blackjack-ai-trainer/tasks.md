@@ -262,18 +262,18 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 
 ### Tests for User Story 7 (REQUIRED - write first) ⚠️
 
-- [ ] T113 [P] [US7] Test replaying a recorded hand log from its seed and action list in `tests/unit/engine/replay.test.ts`, asserting identical cards and settlement every run (SC-008)
-- [ ] T114 [P] [US7] Lint rule test in `tests/unit/architecture.test.ts` asserting no file under `src/engine` or `src/strategy` imports React, the store, sync, or network APIs (Principle I)
+- [X] T113 [P] [US7] Test replaying a recorded hand log from its seed and action list in `tests/unit/engine/replay.test.ts`, asserting identical cards and settlement every run (SC-008)
+- [X] T114 [P] [US7] Lint rule test in `tests/unit/architecture.test.ts` asserting no file under `src/engine` or `src/strategy` imports React, the store, sync, or network APIs (Principle I)
 
 ### Implementation for User Story 7
 
-- [ ] T115 [US7] Implement `replayRound(seed, actions)` in `src/engine/replay.ts` reconstructing a round from a hand log (FR-014, FR-067)
-- [ ] T116 [US7] Add requirement identifiers to test names across `tests/unit/` so each test states the FR or SC it covers (User Story 7 acceptance scenario 2)
-- [ ] T117 [P] [US7] Write `README.md`: what it is, screenshot, live link, architecture diagram, 30-second start, "how the EV engine works", and an SDD section linking to `specs/001-blackjack-ai-trainer/`
-- [ ] T118 [P] [US7] Write `docs/architecture.md` expanding the plan's three diagrams with the layering rationale
-- [ ] T119 [P] [US7] Write ADR in `docs/adr/0003-template-explanations.md` recording decision D1 and the rejected runtime LLM approach
-- [ ] T120 [P] [US7] Write ADR in `docs/adr/0004-device-scoped-identity.md` recording the accepted loss of progression on storage clear
-- [ ] T121 [P] [US7] Add CI and coverage badges to `README.md`, both wired to real workflow runs
+- [X] T115 [US7] Implement `replayRound(seed, actions)` in `src/engine/replay.ts` reconstructing a round from a hand log (FR-014, FR-067)
+- [X] T116 [US7] Add requirement identifiers to test names across `tests/unit/` so each test states the FR or SC it covers (User Story 7 acceptance scenario 2)
+- [X] T117 [P] [US7] Write `README.md`: what it is, screenshot, live link, architecture diagram, 30-second start, "how the EV engine works", and an SDD section linking to `specs/001-blackjack-ai-trainer/`
+- [X] T118 [P] [US7] Write `docs/architecture.md` expanding the plan's three diagrams with the layering rationale
+- [X] T119 [P] [US7] Write ADR in `docs/adr/0003-template-explanations.md` recording decision D1 and the rejected runtime LLM approach
+- [X] T120 [P] [US7] Write ADR in `docs/adr/0004-device-scoped-identity.md` recording the accepted loss of progression on storage clear
+- [X] T121 [P] [US7] Add CI and coverage badges to `README.md`, both wired to real workflow runs
 
 **Checkpoint**: The repository reads as a portfolio artifact, not just working code.
 

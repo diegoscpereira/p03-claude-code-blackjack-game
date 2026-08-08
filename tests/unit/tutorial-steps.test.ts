@@ -21,7 +21,7 @@ import { PHASE_1_RULES } from '../../src/engine/rules-config';
 const rules = PHASE_1_RULES;
 
 describe('the lesson sequence (spec Assumption 6)', () => {
-  it('covers the syllabus the spec names, in order', () => {
+  it('FR-047: covers the syllabus the spec names, in order', () => {
     // Card values, hand totals, soft versus hard, dealer rules, then each of
     // the four actions (User Story 3).
     expect(LESSONS.map((lesson) => lesson.id)).toEqual([
@@ -36,7 +36,7 @@ describe('the lesson sequence (spec Assumption 6)', () => {
     ]);
   });
 
-  it('teaches each of the four actions with a guided hand', () => {
+  it('FR-047: teaches each of the four actions with a guided hand', () => {
     const guided = LESSONS.filter((lesson) => lesson.hand);
     expect(guided.map((lesson) => lesson.hand!.action)).toEqual([
       'hit',
@@ -46,34 +46,34 @@ describe('the lesson sequence (spec Assumption 6)', () => {
     ]);
   });
 
-  it('gives every lesson a title and a body worth reading', () => {
+  it('FR-047: gives every lesson a title and a body worth reading', () => {
     for (const lesson of LESSONS) {
       expect(lesson.title.length).toBeGreaterThan(3);
       expect(lesson.body.length).toBeGreaterThan(40);
     }
   });
 
-  it('uses unique ids', () => {
+  it('FR-046: uses unique ids, so a resume points at one lesson', () => {
     expect(new Set(LESSONS.map((l) => l.id)).size).toBe(LESSON_COUNT);
   });
 });
 
 describe('step advancement (FR-046)', () => {
-  it('advances one step at a time', () => {
+  it('FR-046: advances one step at a time', () => {
     expect(nextStep(0)).toBe(1);
     expect(nextStep(3)).toBe(4);
   });
 
-  it('does not advance past the final step', () => {
+  it('FR-046: does not advance past the final step', () => {
     expect(nextStep(LESSON_COUNT - 1)).toBe(LESSON_COUNT - 1);
   });
 
-  it('knows which step is last', () => {
+  it('FR-046: knows which step is last', () => {
     expect(isLastStep(LESSON_COUNT - 1)).toBe(true);
     expect(isLastStep(0)).toBe(false);
   });
 
-  it('returns null rather than throwing for an out-of-range step', () => {
+  it('FR-046: returns null rather than throwing for an out-of-range step', () => {
     expect(lessonAt(-1)).toBeNull();
     expect(lessonAt(LESSON_COUNT)).toBeNull();
     expect(lessonAt(0)).toBe(LESSONS[0]);
@@ -96,7 +96,7 @@ describe('resuming (FR-046)', () => {
     expect(resumeStep({ dismissed: false, completed: true, lastStep: 8 })).toBe(0);
   });
 
-  it('clamps a stored step beyond the end of the sequence', () => {
+  it('FR-046: clamps a stored step beyond the end of the sequence', () => {
     expect(resumeStep({ dismissed: false, completed: false, lastStep: 99 })).toBe(0);
   });
 });
@@ -127,26 +127,26 @@ describe('lessons agree with the strategy module (FR-051c)', () => {
   );
 });
 
-describe('scriptedRound (T058)', () => {
-  it('deals exactly the cards the lesson asks for', () => {
+describe('scriptedRound (FR-047, T058)', () => {
+  it('FR-047: deals exactly the cards the lesson asks for', () => {
     const round = scriptedRound('8,8', '10');
     expect(round.playerHands[0]!.cards.map((c) => c.rank)).toEqual(['8', '8']);
     expect(round.dealerHand.cards[0]!.rank).toBe('10');
   });
 
-  it('starts in the player phase with a hole card still hidden', () => {
+  it('FR-005: starts in the player phase with a hole card still hidden', () => {
     const round = scriptedRound('10,2', '10');
     expect(round.phase).toBe('player');
     expect(round.dealerHoleCardRevealed).toBe(false);
     expect(round.dealerHand.cards).toHaveLength(2);
   });
 
-  it('leaves enough bankroll for doubling and splitting to be legal', () => {
+  it('FR-002: leaves enough bankroll for doubling and splitting to be legal', () => {
     const round = scriptedRound('8,8', '10');
     expect(round.availableBankroll).toBeGreaterThanOrEqual(round.playerHands[0]!.bet);
   });
 
-  it('is deterministic — the same lesson always deals the same hand', () => {
+  it('FR-004: is deterministic — the same lesson always deals the same hand', () => {
     expect(scriptedRound('6,5', '6')).toEqual(scriptedRound('6,5', '6'));
   });
 });

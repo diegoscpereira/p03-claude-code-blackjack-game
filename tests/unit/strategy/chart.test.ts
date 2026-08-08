@@ -38,7 +38,7 @@ describe('shapeOf (FR-021)', () => {
     expect(shapeOf(cards(shorthand))).toBe(shape);
   });
 
-  it('only calls two identical-value cards a pair', () => {
+  it('FR-021: only calls two identical-value cards a pair', () => {
     expect(shapeOf(cards('8,8,5'))).toBe('hard-21');
   });
 });
@@ -58,7 +58,7 @@ const isReachableShape = (entry: { kind: string; value: number | string }) =>
 describe('recommend matches the reference chart (FR-021, SC-003)', () => {
   const chartable = REFERENCE_CHART.filter(isReachableShape);
 
-  it('covers every charted decision point', () => {
+  it('SC-003: covers every charted decision point', () => {
     // 18 hard rows + 10 soft rows + 10 pair rows, each across 10 upcards.
     expect(REFERENCE_CHART).toHaveLength(38 * DEALER_UPCARDS.length);
   });
@@ -135,7 +135,7 @@ describe('rankActions (FR-022, NFR-002)', () => {
     }
   });
 
-  it('returns nothing when there is no decision to make', () => {
+  it('FR-022: returns nothing when there is no decision to make', () => {
     expect(rankActions(round({ phase: 'settled' }), rules)).toEqual([]);
   });
 
@@ -157,7 +157,7 @@ describe('rankActions (FR-022, NFR-002)', () => {
 });
 
 describe('the chart and the companion cannot disagree (FR-051c)', () => {
-  it('every chart cell resolves through the same lookup the companion uses', () => {
+  it('FR-051c: every chart cell resolves through the same lookup the companion uses', () => {
     const disagreements: string[] = [];
     for (const entry of REFERENCE_CHART.filter(isReachableShape)) {
       const actual = recommend(stateFor(entry.shape, entry.dealerUpcard), rules) as Action;

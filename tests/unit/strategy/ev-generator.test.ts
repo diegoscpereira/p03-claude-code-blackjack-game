@@ -40,7 +40,7 @@ const PUBLISHED_BUST_RATE: Record<string, number> = {
 
 describe('dealer outcome model (research.md R1)', () => {
   it.each(Object.entries(PUBLISHED_BUST_RATE) as [DeckKey, number][])(
-    'matches the published bust rate for a dealer %s within one point',
+    'FR-020: matches the published bust rate for a dealer %s within one point',
     (upcard, published) => {
       const probs = dealerFinalProbabilities(upcard, buildDeck(rules.decks), rules);
       // One percentage point. The residual is the fixed-composition
@@ -50,7 +50,7 @@ describe('dealer outcome model (research.md R1)', () => {
     },
   );
 
-  it('conditions the Ace and ten columns on the dealer not holding a natural', () => {
+  it('FR-020: conditions the Ace and ten columns on the dealer not holding a natural', () => {
     // Deliberately *not* compared against an unconditional published figure.
     // Under the peek rule a dealer natural ends the round before the player
     // decides, so those hands are excluded and the rest renormalised — which
@@ -61,7 +61,7 @@ describe('dealer outcome model (research.md R1)', () => {
     expect(dealerFinalProbabilities('10', deck, rules).bust).toBeGreaterThan(0.21);
   });
 
-  it('every upcard produces a complete probability distribution', () => {
+  it('FR-020: every upcard produces a complete probability distribution', () => {
     for (const upcard of DECK_KEYS) {
       const probs = dealerFinalProbabilities(upcard, buildDeck(rules.decks), rules);
       const total =
@@ -70,14 +70,14 @@ describe('dealer outcome model (research.md R1)', () => {
     }
   });
 
-  it('hitting soft 17 raises the dealer bust rate against a 6', () => {
+  it('FR-012: hitting soft 17 raises the dealer bust rate against a 6', () => {
     const deck = buildDeck(rules.decks);
     const h17 = dealerFinalProbabilities('6', deck, rules);
     const s17 = dealerFinalProbabilities('6', deck, { ...rules, dealerHitsSoft17: false });
     expect(h17.bust).toBeGreaterThan(s17.bust);
   });
 
-  it('a dealer Ace busts far less often than a dealer 6', () => {
+  it('FR-020: a dealer Ace busts far less often than a dealer 6', () => {
     const deck = buildDeck(rules.decks);
     expect(dealerFinalProbabilities('A', deck, rules).bust).toBeLessThan(
       dealerFinalProbabilities('6', deck, rules).bust,
@@ -86,24 +86,24 @@ describe('dealer outcome model (research.md R1)', () => {
 });
 
 describe('standing expected values (research.md R1)', () => {
-  it('standing on 21 is worth far more than standing on 16', () => {
+  it('FR-020: standing on 21 is worth far more than standing on 16', () => {
     const deck = buildDeck(rules.decks);
     const probs = dealerFinalProbabilities('10', deck, rules);
     expect(evStand(21, probs)).toBeGreaterThan(evStand(16, probs));
   });
 
-  it('standing on a hard 16 against a 10 loses roughly half a bet', () => {
+  it('FR-020: standing on a hard 16 against a 10 loses roughly half a bet', () => {
     const probs = dealerFinalProbabilities('10', buildDeck(rules.decks), rules);
     expect(evStand(16, probs)).toBeGreaterThan(-0.62);
     expect(evStand(16, probs)).toBeLessThan(-0.48);
   });
 
-  it('standing on 20 against a 6 is strongly positive', () => {
+  it('FR-020: standing on 20 against a 6 is strongly positive', () => {
     const probs = dealerFinalProbabilities('6', buildDeck(rules.decks), rules);
     expect(evStand(20, probs)).toBeGreaterThan(0.6);
   });
 
-  it('every standing EV lies within a single bet', () => {
+  it('FR-020: every standing EV lies within a single bet', () => {
     const probs = dealerFinalProbabilities('7', buildDeck(rules.decks), rules);
     for (let total = 12; total <= 21; total++) {
       expect(Math.abs(evStand(total, probs))).toBeLessThanOrEqual(1);
@@ -111,14 +111,14 @@ describe('standing expected values (research.md R1)', () => {
   });
 });
 
-describe('deck accounting', () => {
-  it('a six-deck shoe holds 96 ten-valued cards and 24 Aces', () => {
+describe('deck accounting (FR-016, research.md R1)', () => {
+  it('FR-016: a six-deck shoe holds 96 ten-valued cards and 24 Aces', () => {
     const deck = buildDeck(6);
     expect(deck['10']).toBe(96);
     expect(deck['A']).toBe(24);
   });
 
-  it('removing a card leaves the rest untouched', () => {
+  it('FR-016: removing a card leaves the rest untouched', () => {
     const deck = buildDeck(6);
     const after = removeCard(deck, '10');
     expect(after['10']).toBe(95);
@@ -128,7 +128,7 @@ describe('deck accounting', () => {
 });
 
 describe('solved decision points (FR-020)', () => {
-  it('produces an expected value for every action available at a decision point', () => {
+  it('FR-022: produces an expected value for every action available at a decision point', () => {
     const solved = solveDecisionPoint('pair-8', '10', rules);
     expect(solved.hit).toBeDefined();
     expect(solved.stand).toBeDefined();
@@ -136,27 +136,27 @@ describe('solved decision points (FR-020)', () => {
     expect(solved.split).toBeDefined();
   });
 
-  it('offers no split value for a non-pair shape', () => {
+  it('FR-022: offers no split value for a non-pair shape', () => {
     expect(solveDecisionPoint('hard-16', '10', rules).split).toBeUndefined();
   });
 
-  it('doubling a hard 11 against a 6 beats hitting it', () => {
+  it('SC-003: doubling a hard 11 against a 6 beats hitting it', () => {
     const solved = solveDecisionPoint('hard-11', '6', rules);
     expect(solved.double!).toBeGreaterThan(solved.hit!);
   });
 
-  it('hitting a hard 16 against a 10 beats standing on it', () => {
+  it('SC-003: hitting a hard 16 against a 10 beats standing on it', () => {
     const solved = solveDecisionPoint('hard-16', '10', rules);
     expect(solved.hit!).toBeGreaterThan(solved.stand!);
   });
 
-  it('standing on a hard 20 beats every alternative', () => {
+  it('SC-003: standing on a hard 20 beats every alternative', () => {
     const solved = solveDecisionPoint('hard-20', '9', rules);
     expect(solved.stand!).toBeGreaterThan(solved.hit!);
     expect(solved.stand!).toBeGreaterThan(solved.double!);
   });
 
-  it('is deterministic — the same input always yields the same numbers', () => {
+  it('FR-029: is deterministic — the same input always yields the same numbers', () => {
     expect(solveDecisionPoint('soft-18', '9', rules)).toEqual(
       solveDecisionPoint('soft-18', '9', rules),
     );

@@ -53,8 +53,8 @@ describe('rankActions mirrors legalActions exactly (FR-002, FR-022)', () => {
   });
 });
 
-describe('expected values behave like expected values', () => {
-  it('doubling is worth roughly twice the equivalent single bet', () => {
+describe('expected values behave like expected values (FR-022)', () => {
+  it('FR-022: doubling is worth roughly twice the equivalent single bet', () => {
     const ranked = rankActions(at('5,6', '6'), rules);
     const double = ranked.find((r) => r.action === 'double')!;
     const hit = ranked.find((r) => r.action === 'hit')!;
@@ -62,14 +62,14 @@ describe('expected values behave like expected values', () => {
     expect(double.ev).toBeLessThan(hit.ev * 2 + 0.5);
   });
 
-  it('standing on 20 is positive against every upcard', () => {
+  it('FR-022: standing on 20 is positive against every upcard', () => {
     for (const dealer of DEALER_UPCARDS) {
       const stand = rankActions(at('10,10', dealer), rules).find((r) => r.action === 'stand')!;
       expect(stand.ev).toBeGreaterThan(0);
     }
   });
 
-  it('a hard 16 is negative against every upcard — there is no good option', () => {
+  it('FR-022: a hard 16 is negative against every upcard — there is no good option', () => {
     for (const dealer of DEALER_UPCARDS) {
       for (const entry of rankActions(at('10,6', dealer), rules)) {
         expect(entry.ev).toBeLessThan(0);
@@ -77,11 +77,11 @@ describe('expected values behave like expected values', () => {
     }
   });
 
-  it('the same decision point always returns identical numbers (FR-029)', () => {
+  it('FR-029: the same decision point always returns identical numbers', () => {
     expect(rankActions(at('10,6', '10'), rules)).toEqual(rankActions(at('10,6', '10'), rules));
   });
 
-  it('a resolved hand offers no ranking at all', () => {
+  it('FR-022: a resolved hand offers no ranking at all', () => {
     const settled = round({ playerHands: [hand('10,6', { status: 'busted' })] });
     expect(rankActions(settled, rules)).toEqual([]);
   });

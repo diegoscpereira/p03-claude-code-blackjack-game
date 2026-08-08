@@ -1,0 +1,42 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The coverage gate also runs inside `ci.yml`, in constitutional order. It has a
+# workflow of its own so that the README's coverage badge reports *that specific
+# gate* rather than the whole pipeline — a badge wired to a run that also covers
+# lint and typecheck would say nothing about coverage. The duplicated minute is
+# the price of the badge meaning what it claims.
+
+jobs:
+  coverage:
+    name: 90% on engine and strategy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate strategy tables
+        run: npm run generate:ev
+
+      # Fails when src/engine or src/strategy drops below 90% lines — the
+      # threshold lives in vite.config.ts, so this is a gate, not a report.
+      - name: Coverage threshold
+        run: npm run test:coverage
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
