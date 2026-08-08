@@ -50,6 +50,21 @@ create table if not exists hand_logs (
 -- It is written far more often than it is read, so nothing else is indexed.
 create index if not exists hand_logs_player_time on hand_logs (player_id, played_at desc);
 
+-- Access grants.
+--
+-- service_role is the ONLY role that touches these tables: every query arrives
+-- through api/, which holds the service key and nothing else does (FR-068).
+-- Granted explicitly rather than relying on the project's default privileges,
+-- which vary by how and when the project was created — a deployment where they
+-- were absent failed with a bare "permission denied for table user_progress",
+-- an error that points at the schema rather than at the missing grant.
+--
+-- anon and authenticated are deliberately granted nothing. With No RLS to fall
+-- back on, a browser-held key must be unable to reach these rows at all.
+grant usage on schema public to service_role;
+grant all privileges on table user_progress to service_role;
+grant all privileges on table hand_logs to service_role;
+
 -- Neither table stores personal information (FR-054): a generated identifier,
 -- gameplay counters, and hand outcomes. tests/integration/schema-shape.test.ts
 -- enumerates the allowed columns and fails if a later migration adds any other.
