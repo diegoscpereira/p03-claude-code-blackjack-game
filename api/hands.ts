@@ -1,7 +1,8 @@
-import { UUID_PATTERN, fail, isPlainObject, readPlayerId } from './_lib/http';
-import type { ApiHandler, ApiRequest, ApiResponse } from './_lib/http';
-import { supabaseStore } from './_lib/store';
-import type { DataStore, HandRow } from './_lib/store';
+// `.js` extensions are mandatory under Node ESM — see the note in progress.ts.
+import { UUID_PATTERN, fail, isPlainObject, readPlayerId } from './_lib/http.js';
+import type { ApiHandler, ApiRequest, ApiResponse } from './_lib/http.js';
+import { supabaseStore } from './_lib/store.js';
+import type { DataStore, HandRow } from './_lib/store.js';
 
 /**
  * T105 — `POST /api/hands` (contracts/http-api.md).
@@ -102,5 +103,12 @@ export function createHandsHandler(store: DataStore): ApiHandler {
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse): Promise<void> {
-  await createHandsHandler(supabaseStore())(req, res);
+  let store: DataStore;
+  try {
+    store = supabaseStore();
+  } catch {
+    // Retryable rather than fatal — see the note in progress.ts.
+    return fail(res, 503, 'hand log store is not configured');
+  }
+  await createHandsHandler(store)(req, res);
 }

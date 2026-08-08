@@ -1,7 +1,12 @@
-import { fail, isPlainObject, readPlayerId } from './_lib/http';
-import type { ApiHandler, ApiRequest, ApiResponse } from './_lib/http';
-import { supabaseStore } from './_lib/store';
-import type { DataStore, ProgressRow } from './_lib/store';
+// Extensions are mandatory here. `package.json` sets `"type": "module"`, so
+// Vercel runs the compiled functions as ESM, and Node's ESM resolver does not
+// guess extensions the way a bundler does. Omitting `.js` costs nothing locally
+// and crashes every request in production with ERR_MODULE_NOT_FOUND —
+// tests/unit/api-imports.test.ts exists so that cannot happen twice.
+import { fail, isPlainObject, readPlayerId } from './_lib/http.js';
+import type { ApiHandler, ApiRequest, ApiResponse } from './_lib/http.js';
+import { supabaseStore } from './_lib/store.js';
+import type { DataStore, ProgressRow } from './_lib/store.js';
 
 /**
  * T104 — `GET`/`PUT /api/progress` (contracts/http-api.md).
@@ -131,5 +136,14 @@ export function createProgressHandler(store: DataStore): ApiHandler {
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse): Promise<void> {
-  await createProgressHandler(supabaseStore())(req, res);
+  let store: DataStore;
+  try {
+    store = supabaseStore();
+  } catch {
+    // Missing configuration is an operator error, but it must still reach the
+    // client as something it can act on. FR-062 keeps the record queued and
+    // retried, so a 503 here means a misconfigured deploy loses no progression.
+    return fail(res, 503, 'progress store is not configured');
+  }
+  await createProgressHandler(store)(req, res);
 }

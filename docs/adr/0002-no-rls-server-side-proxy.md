@@ -59,10 +59,16 @@ outstanding low-impact item, and it is the first thing to add before any public 
 TypeScript, and writes it back. Two concurrent writes can lose an update. Because the merge is
 monotonic and the client sends absolute totals after every hand, the loss self-heals on the
 next write, and the two-tab scenario the spec calls out converges. An atomic `GREATEST` in SQL
-would remove the window at the cost of putting the merge rule in a place the client could not
-share — and the client needs the same rule for session-start reconciliation (boundary rule 4).
-One rule in `src/sync/reconcile.ts` and `api/progress.ts` beats two rules that agree by
-inspection.
+would remove that window, and is the right change if this ever carries real stakes.
+
+**The merge rule is currently implemented twice**, and that is a known weakness rather than a
+design: `api/progress.ts` merges snake_case rows for the server, and `src/sync/reconcile.ts`
+merges camelCase snapshots for session-start reconciliation (boundary rule 4). They agree by
+inspection and by two test suites — `api-progress.test.ts` and `reconciliation.test.ts` — but
+nothing structural stops them drifting. Extracting one rule over a neutral shape, with both
+sides mapping onto it, is the obvious follow-up; it was not done in Phase 1 because the two
+callers want different field names and the adapter would have been larger than the duplicated
+rule.
 
 ## Alternatives rejected
 
