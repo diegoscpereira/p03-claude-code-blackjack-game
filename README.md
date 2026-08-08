@@ -35,7 +35,9 @@ plan before it builds, and enforce the result with gates it cannot talk its way 
 
 ## How it was built
 
-Each step is a Claude Code command that produced a document, reviewed before the next one ran.
+**Spec-driven development (SDD)**: the specification, plan, and task list are written and
+reviewed as artefacts *before* any code is generated, each step gated on the one before it. The
+`/speckit-*` commands come from GitHub's [Spec Kit](https://github.com/github/spec-kit).
 
 ```
 /speckit-constitution   →  the rules the project cannot break
@@ -127,7 +129,7 @@ npm run test:e2e       # 56 browser tests
 
 ## Additional notes
 
-**On the "AI" term:**nThe app was *built* with
+**On the "AI" term:** The app was *built* with
 AI. The intelligence *inside* it is decision-theoretic — an expected-value solver, strategy
 tables, and rule-based bots. Nothing calls a language model at runtime; the explanations are
 authored content resolved locally, a decision recorded in
