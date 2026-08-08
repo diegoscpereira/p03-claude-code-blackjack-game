@@ -16,15 +16,14 @@ why one is best, and seats two contrasting bots at the table.
 
 This is a **portfolio piece about working with AI, particularly Claude Code**. The whole application was built by driving Claude Code through a spec-driven
 workflow: I set the direction, made the product and architecture calls, reviewed the output,
-and deployed it. Claude wrote the code, the tests, and the documents.
+and deployed it. Claude wrote the code, the tests and the documents.
 
-What I wanted to find out was whether an AI coding agent can be held to an engineering standard
-rather than just asked for snippets — whether you can give it a written constitution, make it
-plan before it builds, and enforce the result with gates it cannot talk its way past.
+What I wanted to validate was that an **AI coding agent can be held to an engineering standard** — whether you can give it a written constitution, make it
+plan before it builds, and enforce the result with gates it cannot talk its way past. Furthermore, one of the goals was to **work with advanced Claude Code concepts and tools, such as Hooks, Permissions and Skills**.
 
-**Claude Code features used**, all in [`.claude/`](.claude/): custom skills as slash commands
+Namely: custom skills as slash commands
 (`/speckit-*`), a written constitution as durable project rules, a scoped permission allowlist,
-and three hooks — see [Hooks](#hooks) below.
+and three hooks — see [`.claude/`](.claude/) and [Hooks](#hooks), below.
 
 | | |
 |---|---|
@@ -99,10 +98,8 @@ graph LR
 **The dotted edge is the only network hop, and the only one allowed to fail.** Everything solid
 is synchronous and local, so the game is fully playable offline after first load.
 
-Progression is written to Supabase Postgres through the app's own serverless endpoints, never
-from the browser — the database credential stays server-side, and a build gate scans the client
-bundle to prove it. Writes go through a queue that survives a tab close and retries safely,
-because every write is idempotent.
+Progression is written to Supabase Postgres through the app's own serverless endpoints. The database credential stays server-side, and a build gate scans the client
+bundle to prove it. Writes go through a queue that survives a tab close and retries safely.
 
 Imports point one way only, enforced by a lint rule *and* by
 [a test](tests/unit/architecture.test.ts) that a `// eslint-disable` cannot silence. Full
