@@ -162,10 +162,36 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  it('FR-025: shows the recommendation and the EV difference afterwards', () => {
+  /** Stands out the rest of the round, so the feedback has something to show. */
+  function playToSettlement(): void {
+    for (let guard = 0; guard < 12; guard += 1) {
+      const state = useGameStore.getState();
+      if (state.round?.phase !== 'player') return;
+      state.act('stand');
+    }
+  }
+
+  /**
+   * Hard 12 against a dealer 4: standing is advised, so hitting is a miss — and
+   * it draws a 5 rather than ending the hand, which is what makes this the one
+   * shape that can prove the feedback stays quiet *mid-round*. Constructed
+   * rather than found by seed, for the reason the split-Ace case gives below.
+   */
+  function twelveVersusFour(): void {
+    useGameStore.setState({
+      round: round({
+        playerHands: [hand('8,4')],
+        dealerHand: hand('4,7', { id: 'dealer' }),
+        shoe: stackedShoe('5,5,5,5'),
+      }),
+    });
+  }
+
+  it('FR-025: shows the recommendation and the EV difference once the round settles', () => {
     useGameStore.getState().deal(SEED);
     useGameStore.getState().collapseBotTurns();
     actAgainstAdvice();
+    playToSettlement();
     render(<CompanionPanel />);
 
     const feedback = screen.getByTestId('companion-feedback');
@@ -173,11 +199,46 @@ describe('acting against the recommendation (FR-024, FR-025)', () => {
     expect(feedback.textContent).toMatch(/\d\.\d\d/);
   });
 
-  it('FR-025: says nothing after a decision that matched', () => {
+  it('FR-025: stays silent while the round is still in play', () => {
+    twelveVersusFour();
+    useGameStore.getState().act('hit');
+    render(<CompanionPanel />);
+
+    expect(useGameStore.getState().round!.phase).toBe('player');
+    expect(useGameStore.getState().roundMisses).toHaveLength(1);
+    expect(screen.queryByTestId('companion-feedback')).not.toBeInTheDocument();
+  });
+
+  it('FR-025: surfaces every miss of the round, not just the last', () => {
+    twelveVersusFour();
+    useGameStore.getState().act('hit'); // 12 → 17, advised to stand
+    useGameStore.getState().act('hit'); // 17 → 22, advised to stand; busts and settles
+    render(<CompanionPanel />);
+
+    const feedback = screen.getByTestId('companion-feedback');
+    expect(feedback.textContent!.match(/was recommended/g)).toHaveLength(2);
+  });
+
+  it('FR-025: the previous round’s corrections do not survive the next deal', () => {
+    twelveVersusFour();
+    useGameStore.getState().act('hit');
+    useGameStore.getState().act('hit');
+    expect(useGameStore.getState().roundMisses).toHaveLength(2);
+
+    useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
+    render(<CompanionPanel />);
+
+    expect(useGameStore.getState().roundMisses).toHaveLength(0);
+    expect(screen.queryByTestId('companion-feedback')).not.toBeInTheDocument();
+  });
+
+  it('FR-025: says nothing after a round whose decisions all matched', () => {
     useGameStore.getState().deal(SEED);
     useGameStore.getState().collapseBotTurns();
     const store = useGameStore.getState();
     store.act(store.recommendation()!);
+    playToSettlement();
     render(<CompanionPanel />);
 
     expect(screen.queryByTestId('companion-feedback')).not.toBeInTheDocument();

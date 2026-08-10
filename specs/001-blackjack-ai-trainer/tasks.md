@@ -291,6 +291,7 @@ description: "Task list for Web-Based Blackjack AI Trainer"
 - [X] T129 [P] Run the full quickstart validation suite V1–V9 from `quickstart.md` on a clean clone
 - [X] T130 Deploy to Vercel with server-side environment variables and confirm the live deployment passes V5 (offline) and V9 (bundle scan)
 - [X] T131 Move the companion below the action controls and place the EV ranking behind a disclosure that re-collapses each round, in `src/ui/table/Table.tsx` and `src/ui/companion/CompanionPanel.tsx` (FR-022, FR-022a). Found in play: the recommendation arrived before the player had formed a view, so the trainer answered its own question
+- [X] T132 Hold the companion's corrections until the round settles and clear them on the next deal, accumulating them per round in `src/store/gameStore.ts` (FR-025). Found in play: a correction outlived its hand, and mid-round it answered a decision the player had not reached
 
 ---
 

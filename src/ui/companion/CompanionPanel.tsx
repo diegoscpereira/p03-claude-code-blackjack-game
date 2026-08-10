@@ -96,6 +96,14 @@ function Ranking({
         className="flex cursor-pointer list-none items-baseline justify-between gap-3 [&::-webkit-details-marker]:hidden"
       >
         <span className="flex items-baseline gap-2">
+          {/* aria-hidden: `details` already announces expanded state, so a
+              screen reader naming the arrow would say it twice. */}
+          <span
+            aria-hidden="true"
+            className={`text-[0.7rem] text-accent transition-transform ${expanded ? 'rotate-90' : ''}`}
+          >
+            ▶
+          </span>
           <Heading />
           <span className="text-xs text-ink-muted">
             {expanded ? 'Hide' : 'Show if you want a hint'}
@@ -146,18 +154,29 @@ function ActionRow({ entry, isRecommended }: { entry: RankedAction; isRecommende
   );
 }
 
-/** FR-025: shown after the fact, requiring no acknowledgement. */
+/**
+ * FR-025: shown once the hand is over, requiring no acknowledgement.
+ *
+ * Held back until settlement so the correction cannot answer a decision the
+ * player has not reached yet — mid-hand it would say "you should have hit"
+ * while the next decision of the same hand is still live in front of them.
+ */
 function Feedback() {
-  const decision = useGameStore((s) => s.lastDecision);
-  const giveUp = useGameStore((s) => s.lastEvGiveUp);
+  const misses = useGameStore((s) => s.roundMisses);
+  const phase = useGameStore((s) => s.round?.phase);
 
-  if (!decision || decision.matched || giveUp === null) return null;
+  if (phase !== 'settled' || misses.length === 0) return null;
 
   return (
-    <p data-testid="companion-feedback" className="text-sm text-info">
-      You chose {decision.chosen}; {decision.recommended} was recommended, worth{' '}
-      {giveUp.toFixed(2)} more per bet. Play on — nothing is blocked.
-    </p>
+    <div data-testid="companion-feedback" className="flex flex-col gap-1 text-sm text-info">
+      {misses.map((miss, index) => (
+        <p key={`${miss.chosen}-${miss.recommended}-${index}`}>
+          You chose {miss.chosen}; {miss.recommended} was recommended, worth {miss.giveUp.toFixed(2)}{' '}
+          more per bet.
+        </p>
+      ))}
+      <p className="text-ink-muted">Play on — nothing is blocked.</p>
+    </div>
   );
 }
 

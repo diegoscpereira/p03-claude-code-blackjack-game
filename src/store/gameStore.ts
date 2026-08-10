@@ -23,6 +23,19 @@ import type { Action, Card, Decision, Rank, RoundState, SettledRound } from '../
 import type { RankedAction } from '../strategy/ev';
 
 /**
+ * One non-recommended decision, kept only for the length of its round.
+ *
+ * Deliberately not a `Decision`: that type is the persisted shape behind
+ * `hand_logs` (data-model.md), and the EV given up is computed on the fly rather
+ * than stored — adding it there would put a derived value in a database column.
+ */
+export interface RoundMiss {
+  readonly chosen: Action;
+  readonly recommended: Action;
+  readonly giveUp: number;
+}
+
+/**
  * T037 — the client store.
  *
  * The store owns everything the engine deliberately does not: the bankroll
@@ -56,6 +69,16 @@ export interface GameState extends ProgressionState {
   lastDecision: Decision | null;
   /** How much EV the last decision gave up, if it was not the recommendation. */
   lastEvGiveUp: number | null;
+  /**
+   * FR-025: every non-recommended decision of the round in play, in order.
+   *
+   * A list rather than the single `lastDecision`, because the feedback is shown
+   * once the round is over: by then a hand with three decisions has overwritten
+   * `lastDecision` twice, and a hand whose *last* decision was right would show
+   * nothing at all despite an earlier mistake. Cleared by `deal`, so it never
+   * outlives the hand it describes.
+   */
+  roundMisses: RoundMiss[];
   /** FR-024a: the two counters the EV accuracy score is derived from. */
   decisionsTaken: number;
   decisionsMatched: number;
@@ -101,6 +124,7 @@ const initialState = () => ({
   companionEnabled: true,
   lastDecision: null,
   lastEvGiveUp: null,
+  roundMisses: [],
   decisionsTaken: 0,
   decisionsMatched: 0,
   botActionsRevealed: 0,
@@ -174,7 +198,8 @@ function roundActions(set: Set, get: Get) {
       const next =
         dealt.phase === 'bots' ? playBots(dealt, rules, createRng(roundSeed ^ 0x5eed)) : dealt;
 
-      set({ round: next, lastSettled: null, botActionsRevealed: 0 });
+      // FR-025: the previous hand's corrections go with the previous hand.
+      set({ round: next, lastSettled: null, botActionsRevealed: 0, roundMisses: [] });
       startRevealTimer(set, get);
 
       // A natural resolves without the player acting (US1 acceptance 3).
@@ -316,9 +341,16 @@ function describeDecision(round: RoundState, chosen: Action): Decision | null {
  * turning the companion off.
  */
 function recordDecision(set: Set, get: Get, decision: Decision, giveUp: number | null): void {
+  const missed = !decision.matched && giveUp !== null;
   set({
     lastDecision: decision,
     lastEvGiveUp: decision.matched ? null : giveUp,
+    roundMisses: missed
+      ? [
+          ...get().roundMisses,
+          { chosen: decision.chosen, recommended: decision.recommended, giveUp },
+        ]
+      : get().roundMisses,
     decisionsTaken: get().decisionsTaken + 1,
     decisionsMatched: get().decisionsMatched + (decision.matched ? 1 : 0),
   });

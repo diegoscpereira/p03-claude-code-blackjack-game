@@ -361,9 +361,12 @@ only where the named capability is present.
   Ace (FR-011).
 - **FR-024b**: `[State-Driven]` While a player has taken no decisions, the system SHALL
   display the EV accuracy score as unavailable rather than as zero percent.
-- **FR-025**: `[Event-Driven]` When the player takes a non-recommended action, the interface
-  SHALL show the recommendation and the EV difference without blocking play or requiring
-  acknowledgement.
+- **FR-025**: `[Event-Driven]` When a round in which the player took one or more
+  non-recommended actions settles, the interface SHALL show, for each of them in order, the
+  recommendation and the EV difference, without blocking play or requiring acknowledgement.
+  The corrections SHALL be held back until the round settles, so that a correction cannot
+  answer a decision the player has not yet reached, and SHALL be cleared when the next round
+  begins.
 - **FR-026**: `[Optional Features]` Where the companion is disabled by the player, the system
   SHALL still record recommendation-match data for post-game analysis but SHALL NOT display
   advice during play.

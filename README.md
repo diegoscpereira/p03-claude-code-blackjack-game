@@ -26,8 +26,8 @@ and three hooks — see [`.claude/`](.claude/) and [Hooks](#hooks), below.
 
 | | |
 |---|---|
-| **Tasks planned and completed** | 134 of 134, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
-| **Tests** | 1,079 unit + integration, 56 end-to-end |
+| **Tasks planned and completed** | 135 of 135, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
+| **Tests** | 1,082 unit + integration, 56 end-to-end |
 | **Coverage on the rules engine** | 98.8% (`src/engine`), 99.3% (`src/strategy`) |
 | **CI gates** | 6, all blocking |
 | **Architecture decision records** | 4, each naming the rejected alternative |
@@ -154,7 +154,7 @@ npm run dev
 **5. Optional — run the suite**
 
 ```bash
-npm run test       # 1,079 tests, ~5s
+npm run test       # 1,082 tests, ~5s
 npm run test:e2e   # 56 browser tests
 ```
 
