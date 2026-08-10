@@ -17,7 +17,7 @@ export default function App() {
       <header className="border-b border-border bg-panel">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3">
           <div>
-            <h1 className="text-lg font-semibold text-accent">Blackjack AI Trainer</h1>
+            <h1 className="text-lg font-semibold text-accent">Blackjack Trainer</h1>
             <p className="text-xs text-ink-muted">
               6 decks · dealer hits soft 17 · blackjack pays 3:2
             </p>

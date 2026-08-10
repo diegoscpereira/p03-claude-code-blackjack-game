@@ -1,12 +1,11 @@
-# Blackjack AI Trainer
+# Blackjack Trainer
 
-[![CI](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/ci.yml/badge.svg)](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/ci.yml)
-[![Coverage](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/coverage.yml/badge.svg)](https://github.com/diegoscpereira/p03-claude-code-blackjack-game/actions/workflows/coverage.yml)
+[![CI](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/ci.yml/badge.svg)](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/ci.yml)
+[![Coverage](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/coverage.yml/badge.svg)](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/coverage.yml)
+[![Live demo](https://img.shields.io/badge/demo-live-brightgreen)](https://blackjack-trainer.vercel.app)
 
 A browser Blackjack trainer that shows the **expected value of every legal action**, explains
 why one is best, and seats two contrasting bots at the table.
-
-**Live:** [p03-claude-code-blackjack-game.vercel.app](https://p03-claude-code-blackjack-game.vercel.app)
 
 ![The table mid-hand: progression, dealer and player hands, two bots, and the expected-value companion](docs/screenshots/table.png)
 
@@ -130,8 +129,8 @@ as pending, which is the offline behaviour working as designed.
 **1. Clone**
 
 ```bash
-git clone https://github.com/diegoscpereira/p03-claude-code-blackjack-game.git
-cd p03-claude-code-blackjack-game
+git clone https://github.com/diegoscpereira/blackjack-trainer.git
+cd blackjack-trainer
 ```
 
 **2. Install**
@@ -166,10 +165,10 @@ Deployment and the full validation checklist are in
 
 ## Additional notes
 
-**On the "AI" term:** The app was *built* with
-AI. The intelligence *inside* it is decision-theoretic — an expected-value solver, strategy
-tables, and rule-based bots. Nothing calls a language model at runtime; the explanations are
-authored content resolved locally, a decision recorded in
+**Built with AI, but no AI inside.** The app was *built* by driving Claude Code. The
+intelligence *inside* it is decision-theoretic — an expected-value solver, strategy tables, and
+rule-based bots. Nothing calls a language model at runtime; the explanations are authored
+content resolved locally, a decision recorded in
 [ADR 0003](docs/adr/0003-template-explanations.md) along with why generating them live would
 have been the wrong trade.
 
