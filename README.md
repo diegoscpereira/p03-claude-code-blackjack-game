@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/ci.yml/badge.svg)](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/ci.yml)
 [![Coverage](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/coverage.yml/badge.svg)](https://github.com/diegoscpereira/blackjack-trainer/actions/workflows/coverage.yml)
-[![Live demo](https://img.shields.io/badge/demo-live-brightgreen)](https://blackjack-trainer.vercel.app)
+[![Live demo](https://img.shields.io/badge/demo-live-brightgreen)](https://blackjack-ev-trainer.vercel.app)
 
 A browser Blackjack trainer that shows the **expected value of every legal action**, explains
 why one is best, and seats two contrasting bots at the table.
