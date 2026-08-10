@@ -26,7 +26,7 @@ and three hooks — see [`.claude/`](.claude/) and [Hooks](#hooks), below.
 
 | | |
 |---|---|
-| **Tasks planned and completed** | 135 of 135, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
+| **Tasks planned and completed** | 136 of 136, tracked in [`tasks.md`](specs/001-blackjack-ai-trainer/tasks.md) |
 | **Tests** | 1,082 unit + integration, 56 end-to-end |
 | **Coverage on the rules engine** | 98.8% (`src/engine`), 99.3% (`src/strategy`) |
 | **CI gates** | 6, all blocking |

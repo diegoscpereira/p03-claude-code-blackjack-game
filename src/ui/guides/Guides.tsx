@@ -4,6 +4,7 @@ import { ALL_UNLOCKS } from '../../progression/levels';
 import type { UnlockId } from '../../progression/levels';
 import { StrategyChart } from './StrategyChart';
 import { PostGameAnalysis } from './PostGameAnalysis';
+import { Chevron } from '../common/Chevron';
 import { UNLOCK_FAMILY, UNLOCK_LABELS, levelFor } from './unlockLabels';
 
 /**
@@ -29,8 +30,9 @@ export function Guides() {
         data-testid="open-guides"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="text-sm font-semibold text-accent"
+        className="flex items-center gap-2 text-sm font-semibold text-accent"
       >
+        <Chevron expanded={open} />
         {open ? 'Hide guides' : 'Guides and analysis'}
       </button>
 

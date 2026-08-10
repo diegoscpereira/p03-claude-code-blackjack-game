@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Explanation } from './Explanation';
+import { Chevron } from '../common/Chevron';
 import { ACTION_LABELS } from '../table/actionReasons';
 import { useGameStore } from '../../store/gameStore';
 import type { Action } from '../../engine/types';
@@ -92,14 +93,7 @@ function Ranking({
         data-testid="companion-summary"
         className="flex cursor-pointer list-none items-baseline gap-2 [&::-webkit-details-marker]:hidden"
       >
-        {/* aria-hidden: `details` already announces expanded state, so a screen
-            reader naming the arrow would say it twice. */}
-        <span
-          aria-hidden="true"
-          className={`text-[0.7rem] text-accent transition-transform ${expanded ? 'rotate-90' : ''}`}
-        >
-          ▶
-        </span>
+        <Chevron expanded={expanded} />
         <Heading />
         <span className="text-xs text-ink-muted">
           {expanded ? 'Hide' : 'Show if you want a hint'}

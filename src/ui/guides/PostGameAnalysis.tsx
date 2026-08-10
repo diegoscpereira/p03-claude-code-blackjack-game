@@ -51,9 +51,10 @@ function HandEntry({ record, number }: { record: HandRecord; number: number }) {
           {record.outcome} · {record.netChange >= 0 ? '+' : ''}
           {record.netChange}
         </span>
-        {/* SC-008: the seed is shown because it is the whole replay claim — a
-            reviewer can reproduce this exact hand from it alone. */}
-        <span className="text-xs text-ink-muted">seed {record.seed}</span>
+        {/* The seed is deliberately not shown. FR-067 and SC-008 ask that it be
+            *retained* — it still is, in the hand log and its `hand_logs` row —
+            and a reviewer replays from there. On screen it read as noise to the
+            player, who can do nothing with it. */}
       </p>
 
       {record.decisions.length > 0 && (
