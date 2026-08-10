@@ -333,8 +333,15 @@ only where the named capability is present.
 - **FR-021**: `[Ubiquitous]` The AI companion SHALL identify the highest-EV action as the
   recommendation and SHALL agree with a published basic strategy chart for the configured
   rules in every decision point of that chart.
-- **FR-022**: `[Event-Driven]` When a decision point is reached, the interface SHALL display
-  each legal action with its expected value and mark the recommendation.
+- **FR-022**: `[Event-Driven]` When a decision point is reached, the interface SHALL make each
+  legal action's expected value reachable from a single disclosure control that names what it
+  reveals, and SHALL mark the recommendation within it. The control SHALL sit below the action
+  controls, so that the player meets the decision before the answer to it.
+- **FR-022a**: `[State-Driven]` While a round is in progress the disclosure SHALL hold whatever
+  state the player last set it to, opening and closing on demand. When a new round begins it
+  SHALL return to collapsed, so every hand starts from the player's own judgement. The
+  post-decision feedback of FR-025 is outside the disclosure and SHALL remain visible while it
+  is collapsed.
 - **FR-023**: `[Ubiquitous]` The AI companion SHALL accompany each recommendation with a
   plain-language explanation naming the player total, the dealer upcard, and the reason the
   recommended action wins. Explanations SHALL be drawn from a precomputed library keyed on

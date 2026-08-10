@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Explanation } from './Explanation';
 import { ACTION_LABELS } from '../table/actionReasons';
 import { useGameStore } from '../../store/gameStore';
@@ -5,19 +6,32 @@ import type { Action } from '../../engine/types';
 import type { RankedAction } from '../../strategy/ev';
 
 /**
- * T074 — the companion panel (FR-022, FR-025, FR-026).
+ * T074 — the companion panel (FR-022, FR-022a, FR-025, FR-026).
  *
  * Every legal action with its expected value, the top one marked. Note what is
  * absent: there is no dialog, no confirmation, and no way for this panel to
  * refuse an action. FR-025 requires a non-recommended choice to proceed without
  * blocking, so the feedback appears *after* the fact and asks nothing of the
  * player.
+ *
+ * FR-022a: the ranking sits behind a disclosure, collapsed at the start of every
+ * round. A trainer that answers before you have thought is not teaching — the
+ * click is the pause in which the player forms their own view. The feedback
+ * below is deliberately *outside* the disclosure: it is the half of the loop
+ * that arrives after the decision is committed, and it should cost no click.
  */
 export function CompanionPanel() {
   const round = useGameStore((s) => s.round);
   const enabled = useGameStore((s) => s.companionEnabled);
   const ranked = useGameStore((s) => s.rankedActions());
   const decision = useGameStore((s) => s.lastDecision);
+  const seed = useGameStore((s) => s.round?.seed ?? null);
+
+  // Held here rather than in the store: it is view state with a round-long life,
+  // and persisting it would defeat the point — expanded once would mean expanded
+  // for every hand after, which is the behaviour this replaces.
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => setExpanded(false), [seed]);
 
   if (!round || !enabled) return null;
 
@@ -34,26 +48,74 @@ export function CompanionPanel() {
       aria-label="Strategy companion"
       className="flex flex-col gap-3 rounded-xl border border-border bg-panel p-4"
     >
-      <header className="flex items-baseline justify-between gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-          Expected value
-        </h2>
-        <AccuracyBadge />
-      </header>
-
-      {hasAdvice && (
-        <>
-          <ul className="flex flex-col gap-1">
-            {ranked.map((entry, index) => (
-              <ActionRow key={entry.action} entry={entry} isRecommended={index === 0} />
-            ))}
-          </ul>
-          <Explanation />
-        </>
+      {hasAdvice ? (
+        <Ranking ranked={ranked} expanded={expanded} onToggle={setExpanded} />
+      ) : (
+        <header className="flex items-baseline justify-between gap-3">
+          <Heading />
+          <AccuracyBadge />
+        </header>
       )}
 
       <Feedback />
     </section>
+  );
+}
+
+function Heading() {
+  return (
+    <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">Expected value</h2>
+  );
+}
+
+/**
+ * FR-022, FR-022a — the ranking behind its disclosure. Split out to keep
+ * `CompanionPanel` inside the size cap, as `ActionRow` and `Feedback` already are.
+ *
+ * `<details>` rather than a hand-rolled button: it carries the expanded state in
+ * the accessibility tree and is keyboard-operable without a keydown handler,
+ * which NFR-008 requires of every control.
+ */
+function Ranking({
+  ranked,
+  expanded,
+  onToggle,
+}: {
+  ranked: RankedAction[];
+  expanded: boolean;
+  onToggle: (open: boolean) => void;
+}) {
+  return (
+    <details
+      data-testid="companion-disclosure"
+      open={expanded}
+      onToggle={(event) => onToggle(event.currentTarget.open)}
+    >
+      <summary
+        data-testid="companion-summary"
+        className="flex cursor-pointer list-none items-baseline justify-between gap-3 [&::-webkit-details-marker]:hidden"
+      >
+        <span className="flex items-baseline gap-2">
+          <Heading />
+          <span className="text-xs text-ink-muted">
+            {expanded ? 'Hide' : 'Show if you want a hint'}
+          </span>
+        </span>
+        <AccuracyBadge />
+      </summary>
+
+      {/* The gap lives here rather than on `details`: `display: flex` on a
+          `details` element leaks its content into the collapsed state in some
+          browsers, which would defeat the whole disclosure. */}
+      <div className="mt-3 flex flex-col gap-3">
+        <ul className="flex flex-col gap-1">
+          {ranked.map((entry, index) => (
+            <ActionRow key={entry.action} entry={entry} isRecommended={index === 0} />
+          ))}
+        </ul>
+        <Explanation />
+      </div>
+    </details>
   );
 }
 

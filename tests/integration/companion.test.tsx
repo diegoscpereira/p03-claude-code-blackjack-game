@@ -1,5 +1,5 @@
 ﻿import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CompanionPanel } from '../../src/ui/companion/CompanionPanel';
 import { Table } from '../../src/ui/table/Table';
@@ -25,11 +25,21 @@ beforeEach(() => {
 /** A seed that deals a hand where hitting and standing differ in EV. */
 const SEED = 20260804;
 
+/**
+ * FR-022a: the ranking is behind a disclosure, so anything asserting that the
+ * player can *see* an EV has to open it first. Assertions that the numbers are
+ * merely present in the DOM would pass while collapsed and prove nothing.
+ */
+async function expandCompanion(): Promise<void> {
+  await userEvent.setup().click(screen.getByTestId('companion-summary'));
+}
+
 describe('CompanionPanel (FR-022)', () => {
-  it('FR-022: lists every legal action with its expected value', () => {
+  it('FR-022: lists every legal action with its expected value', async () => {
     useGameStore.getState().deal(SEED);
     useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
+    await expandCompanion();
 
     const rows = screen.getAllByTestId(/^companion-action-/);
     expect(rows.length).toBeGreaterThanOrEqual(2);
@@ -38,18 +48,59 @@ describe('CompanionPanel (FR-022)', () => {
     }
   });
 
-  it('FR-022: marks exactly one action as recommended', () => {
+  it('FR-022: marks exactly one action as recommended', async () => {
     useGameStore.getState().deal(SEED);
     useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
+    await expandCompanion();
     expect(screen.getAllByTestId('companion-recommended')).toHaveLength(1);
   });
 
-  it('FR-023: shows a plain-language explanation alongside the recommendation', () => {
+  it('FR-023: shows a plain-language explanation alongside the recommendation', async () => {
     useGameStore.getState().deal(SEED);
     useGameStore.getState().collapseBotTurns();
     render(<CompanionPanel />);
+    await expandCompanion();
     expect(screen.getByTestId('companion-explanation').textContent?.length).toBeGreaterThan(20);
+  });
+
+  it('FR-022a: the ranking starts collapsed at a decision point', () => {
+    useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
+    render(<CompanionPanel />);
+
+    expect(screen.getByTestId<HTMLDetailsElement>('companion-disclosure').open).toBe(false);
+  });
+
+  it('FR-022a: the player can close it again within the same round', async () => {
+    useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
+    render(<CompanionPanel />);
+    const disclosure = screen.getByTestId<HTMLDetailsElement>('companion-disclosure');
+
+    await expandCompanion();
+    expect(disclosure.open).toBe(true);
+    await expandCompanion();
+    expect(disclosure.open).toBe(false);
+  });
+
+  it('FR-022a: a new round returns it to collapsed', async () => {
+    useGameStore.getState().deal(SEED);
+    useGameStore.getState().collapseBotTurns();
+    render(<CompanionPanel />);
+
+    await expandCompanion();
+    expect(screen.getByTestId<HTMLDetailsElement>('companion-disclosure').open).toBe(true);
+
+    // A different seed: the reset keys on round identity, and `deal` reuses an
+    // explicit seed verbatim, so repeating SEED would not be a new round at all.
+    await act(async () => {
+      useGameStore.getState().act('stand');
+      useGameStore.getState().deal(SEED + 1);
+      useGameStore.getState().collapseBotTurns();
+    });
+
+    expect(screen.getByTestId<HTMLDetailsElement>('companion-disclosure').open).toBe(false);
   });
 
   it('FR-026: records match data but shows no advice when disabled', () => {

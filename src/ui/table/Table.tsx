@@ -51,7 +51,6 @@ export function Table() {
       <Bankroll />
       <Felt revealed={revealed} />
       <BotSeats />
-      <CompanionPanel />
       <Outcome />
 
       {canDeal ? (
@@ -66,6 +65,9 @@ export function Table() {
       ) : (
         <Controls round={round} legal={legal} onAct={onAct} locked={controlsLocked} />
       )}
+
+      {/* FR-022: below the controls, so the decision is met before the answer to it. */}
+      <CompanionPanel />
 
       {lastSettled && (
         <p className="sr-only" role="status" aria-live="polite">
