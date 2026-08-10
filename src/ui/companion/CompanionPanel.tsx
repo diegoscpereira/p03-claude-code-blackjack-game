@@ -51,10 +51,7 @@ export function CompanionPanel() {
       {hasAdvice ? (
         <Ranking ranked={ranked} expanded={expanded} onToggle={setExpanded} />
       ) : (
-        <header className="flex items-baseline justify-between gap-3">
-          <Heading />
-          <AccuracyBadge />
-        </header>
+        <Heading />
       )}
 
       <Feedback />
@@ -93,23 +90,20 @@ function Ranking({
     >
       <summary
         data-testid="companion-summary"
-        className="flex cursor-pointer list-none items-baseline justify-between gap-3 [&::-webkit-details-marker]:hidden"
+        className="flex cursor-pointer list-none items-baseline gap-2 [&::-webkit-details-marker]:hidden"
       >
-        <span className="flex items-baseline gap-2">
-          {/* aria-hidden: `details` already announces expanded state, so a
-              screen reader naming the arrow would say it twice. */}
-          <span
-            aria-hidden="true"
-            className={`text-[0.7rem] text-accent transition-transform ${expanded ? 'rotate-90' : ''}`}
-          >
-            ▶
-          </span>
-          <Heading />
-          <span className="text-xs text-ink-muted">
-            {expanded ? 'Hide' : 'Show if you want a hint'}
-          </span>
+        {/* aria-hidden: `details` already announces expanded state, so a screen
+            reader naming the arrow would say it twice. */}
+        <span
+          aria-hidden="true"
+          className={`text-[0.7rem] text-accent transition-transform ${expanded ? 'rotate-90' : ''}`}
+        >
+          ▶
         </span>
-        <AccuracyBadge />
+        <Heading />
+        <span className="text-xs text-ink-muted">
+          {expanded ? 'Hide' : 'Show if you want a hint'}
+        </span>
       </summary>
 
       {/* The gap lives here rather than on `details`: `display: flex` on a
@@ -177,17 +171,5 @@ function Feedback() {
       ))}
       <p className="text-ink-muted">Play on — nothing is blocked.</p>
     </div>
-  );
-}
-
-/** FR-024b: unavailable rather than 0% before any decision has been taken. */
-function AccuracyBadge() {
-  const taken = useGameStore((s) => s.decisionsTaken);
-  const matched = useGameStore((s) => s.decisionsMatched);
-
-  return (
-    <p className="text-xs text-ink-muted" data-testid="ev-accuracy">
-      {taken === 0 ? 'Accuracy — not yet available' : `Accuracy ${Math.round((matched / taken) * 100)}%`}
-    </p>
   );
 }
